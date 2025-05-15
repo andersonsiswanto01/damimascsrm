@@ -1,0 +1,5 @@
+@media (prefers-color-scheme: dark) {
+    .fi-topbar > a img {
+        content: url('/log/logo-white.png') !important;
+    }
+}
