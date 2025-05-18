@@ -1,5 +1,6 @@
 deployment:
   tasks:
+    - rsync -av --delete /home/benihdam/damimascrm/public/ /home/benihdam/public_html/
     - /opt/cpanel/composer/bin/composer install --no-dev --optimize-autoloader
     - php artisan migrate --force
     - php artisan config:cache
