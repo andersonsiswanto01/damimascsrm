@@ -376,16 +376,18 @@ class OrderResource extends Resource
                     ->color(fn (bool $state): string => $state ? 'success' : 'gray'),
 
                 Tables\Columns\TextColumn::make('orderMaster.customer.telephone_number')
-                ->label('Customer Phone')
-                ->url(fn ($record) => 
-                    'https://wa.me/' . preg_replace(
-                        '/[^0-9]/', 
-                        '', 
-                        $record->orderMaster->customer->phone_code . $record->orderMaster->customer->telephone_number
+                    ->label('Customer Phone')
+                    ->url(fn ($record) => 
+                        optional($record->orderMaster?->customer?->telephone_number) ? 
+                            'https://wa.me/' . preg_replace(
+                                '/[^0-9]/',
+                                '',
+                                ($record->orderMaster->customer->phone_code ?? '') . 
+                                ($record->orderMaster->customer->telephone_number ?? '')
+                            ) : null
                     )
-                )
-                ->openUrlInNewTab()
-                ->formatStateUsing(fn ($state) => $state),
+                    ->openUrlInNewTab()
+                    ->formatStateUsing(fn ($state) => $state),
 
                 Tables\Columns\TextColumn::make('orderMaster.user.name')
                     ->label('Sales Representative')->sortable(),
