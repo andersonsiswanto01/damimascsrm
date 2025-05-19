@@ -80,8 +80,17 @@ class AdminPanelProvider extends PanelProvider
             ])
             ->plugins([
                 FilamentFullCalendarPlugin::make()
-                ->selectable(true)
-                ->editable(true),
+                ->selectable()
+                ->editable()
+                ->locale('en')
+                
+                ->plugins([
+                    'dayGrid',
+                    'timeGrid',
+                    'timeline',
+                    'resourceTimeGrid',
+                    'interaction',
+                ]),
                 
                 FilamentEditProfilePlugin::make()
                     ->slug('my-profile')

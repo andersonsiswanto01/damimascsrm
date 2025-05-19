@@ -19,7 +19,7 @@ class CalendarWidget extends FullCalendarWidget
         return [
             'firstDay' => 1,
             'headerToolbar' => [
-                'left' => 'dayGridWeek,dayGridDay',
+                'left' => 'dayGridMonth,timeGridWeek,timeGridDay',
                 'center' => 'title',
                 'right' => 'prev,next today',
             ],
@@ -44,6 +44,21 @@ class CalendarWidget extends FullCalendarWidget
         ];
     }
 
+protected function headerActions(): array
+ {
+     return [
+         Actions\CreateAction::make()
+             ->mountUsing(
+                 function (Forms\Form $form, array $arguments) {
+                     $form->fill([
+                         'start_time' => $arguments['start'] ?? null,
+                         'end_time' => $arguments['end'] ?? null
+                     ]);
+                 }
+             )
+     ];
+ }
+
     protected function modalActions(): array
  {
      return [
@@ -55,7 +70,7 @@ class CalendarWidget extends FullCalendarWidget
                          'title' => $record->title,
                          'description' => $record->description,
                          'name' => $record->name,
-                         'start_time' => $arguments['event']['start'] ?? $record->starts_at,
+                        'start_time' => $arguments['event']['start'] ?? $record->starts_at,
                          'end_time' => $arguments['event']['end'] ?? $record->ends_at
                      ]);
                  }
@@ -72,24 +87,14 @@ class CalendarWidget extends FullCalendarWidget
             ->where('end_time', '<=', $fetchInfo['end'])
             ->get()
             ->map(
-
-
-                fn (Calendar $event) => Calendar::make()
-                ->id($event->id)
-                ->title($event->title)
-                ->start($event->start_time)
-                ->end($event->end_time)
-                ->description($event->description),
-
-        )
-            //     fn (Calendar $event) => [
-            //         'id' => $event->id,
-            //         'title' => $event->title,
-            //         'start' => $event->start_time,
-            //         'end' => $event->end_time,
-            //         'description' => $event->description,
-            //                  ]
-            // )
+                fn (Calendar $event) => [
+                    'id' => $event->id,
+                    'title' => $event->title,
+                    'start' => $event->start_time,
+                    'end' => $event->end_time,
+                    'description' => $event->description,
+                             ]
+            )
             ->all();
     }
 

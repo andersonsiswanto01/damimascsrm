@@ -66,7 +66,7 @@ class OrderDocumentVerificationResource extends Resource
                     // First increment: Confirm document verification
                     $record->incrementOrderStage('confirmed! Verifying Payment');
                     // Check related orderMaster payment_status
-                    if ($record->orderMaster->payment_verified === 1) {
+                    if ($record->orderMaster->payment_verified == 1) {
                         // Second increment: Because payment is already confirmed
                         $record->incrementOrderStage('payment already confirmed, skipping...');
                     }
