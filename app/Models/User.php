@@ -8,6 +8,7 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Filament\Models\Contracts\HasAvatar;
 use Illuminate\Support\Facades\Storage;
+use Filament\Panel;
 
 class User extends Authenticatable implements HasAvatar
 {
@@ -48,6 +49,13 @@ class User extends Authenticatable implements HasAvatar
             'password' => 'hashed',
         ];
     }
+
+     public function canAccessPanel(Panel $panel): bool
+    {
+         return true;
+    }
+
+
 
 
     public function getFilamentAvatarUrl(): ?string
