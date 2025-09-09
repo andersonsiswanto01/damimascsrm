@@ -21,7 +21,7 @@ class CorporateSp2bksResource extends Resource
 {
     protected static ?string $model = CorporateSp2bks::class;
     protected static ?string $navigationGroup = 'Corporate Analyzer'; // This groups it under 'Corporate Resources'
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static ?string $navigationIcon = 'heroicon-o-document-text';
 
     public static function form(Form $form): Form
     {

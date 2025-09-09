@@ -7,7 +7,7 @@ use App\Http\Controllers\CustomerController;
 use App\Livewire\PublicSalesForm;
 use App\Http\Controllers\OrderPdfController;
 use App\Http\Controllers\DocumentController;
-
+use App\Http\Controllers\DownloadController;
 
 
 // Route::view('/', 'welcome');
@@ -16,13 +16,13 @@ Route::get('/', function () {
     return view('app'); // Assuming your homepage Blade file is resources/views/home.blade.php
 });
 
-Route::view('dashboard', 'dashboard')
-    ->middleware(['auth', 'verified'])
-    ->name('dashboard');
+// Route::view('dashboard', 'dashboard')
+//     ->middleware(['auth', 'verified'])
+//     ->name('dashboard');
 
-Route::view('profile', 'profile')
-    ->middleware(['auth'])
-    ->name('profile');
+// Route::view('profile', 'profile')
+//     ->middleware(['auth'])
+//     ->name('profile');
 
     Route::get('order-upload/{order}', PublicSalesForm::class)->name('order.upload');
 
@@ -52,6 +52,10 @@ Route::get('/orders/sd/{order}/pdf', [OrderPdfController::class, 'generatesd'])
     });
 
     Route::get('storage/private/signature/{file}', [DocumentController::class, 'showDocument'])->middleware('auth')->name('document.show');
+
+    Route::get('/download/{filename}', [DownloadController::class, 'download'])
+    ->middleware('auth')
+    ->name('download.document');
 
     Route::get('/private-avatar/{user}', function (\App\Models\User $user) {
         if (!$user->avatar_url || !Storage::disk('private')->exists($user->avatar_url)) {

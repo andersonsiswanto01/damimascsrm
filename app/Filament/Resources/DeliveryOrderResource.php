@@ -29,7 +29,6 @@ use Filament\Tables\Actions\ActionGroup;
 
 class DeliveryOrderResource extends Resource
 {
-    protected static ?string $model = DeliveryOrder::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
 

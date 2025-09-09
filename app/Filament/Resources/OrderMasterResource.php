@@ -686,6 +686,7 @@ class OrderMasterResource extends Resource
                                     ->fetchFileInformation(false)
                                     ->acceptedFileTypes(['image/*'])
                                     ->label('Statement Letter')
+                                    ->multiple()
                                     ->nullable(),
 
                                     FileUpload::make('KTP_photo')

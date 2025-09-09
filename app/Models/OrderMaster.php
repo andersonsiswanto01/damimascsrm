@@ -69,6 +69,17 @@ class OrderMaster extends Model
         };
     }
 
+public function incrementOrderStage(): void
+{
+    $orders = Order::where('order_master_id', $this->id)->get();
+
+    foreach ($orders as $order) {
+        if ($order->order_stage_id == 3) {
+            $order->incrementOrderStage('Payment Verified');
+        }
+    }
+}
+
     public function getAllOrdersHaveStageGreaterThanTwoAttribute()
 {
     // Check if all related orders have order_stage > 2

@@ -65,6 +65,9 @@ class OrderResource extends Resource
                                             }
                                         }
                                     ]),
+
+
+                                
                             
                                 Select::make('district_id')
                                     ->relationship('district', 'name')
@@ -264,6 +267,7 @@ class OrderResource extends Resource
                                     ->fetchFileInformation(false)
                                     ->acceptedFileTypes(['image/*'])
                                     ->label('Statement Letter')
+                                    ->multiple()
                                     ->nullable(),
 
                                 FileUpload::make('KTP_photo')

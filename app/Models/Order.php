@@ -64,6 +64,7 @@ class Order extends Model
         'landcertificate_photo' => 'array', // or 'attachments', etc.
         'KTP_photo' => 'array',
         'kartu_keluarga' => 'array',
+        'statementletter_photo' => 'array',
     ];
     
 //     public function generateSnapshot()

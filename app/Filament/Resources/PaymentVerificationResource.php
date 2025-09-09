@@ -16,6 +16,7 @@ use Filament\Tables\Actions\Action;
 use Filament\Tables\Columns\TextColumn;
 use App\Models\Order;
 
+
 use App\Models\OrderMaster;
 use App\Models\OrderStage;
 use App\Models\User;
@@ -29,7 +30,7 @@ class PaymentVerificationResource extends Resource
 {
 
 
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static ?string $navigationIcon = 'heroicon-s-shield-check';
     protected static ?string $navigationGroup = 'Admin';
 
 
@@ -81,6 +82,7 @@ class PaymentVerificationResource extends Resource
                 ->requiresConfirmation()
                 ->action(function (OrderMaster $record) {
                     $record->payment_verified = true;
+                    $record->incrementOrderStage('Payment Verified'); // Increment the order stage to 'Payment Verified'
                     $record->save();
                 }),
 

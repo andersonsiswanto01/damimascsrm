@@ -87,7 +87,6 @@ class OrderPdfController extends Controller
         // Step 4: Combine the file extension and the base64 encoded image data to create a data URI
         // This will embed the image directly into the HTML or PDF, without requiring a file URL
         $signatureBase64 = 'data:image/' . $imageType . ';base64,' . $imageData;
-
         // Step 5: Use this base64 string in your Blade view (or wherever you need to display the image)
         $data = [
             'orderNumber' => $order->id . '/DIR/SUS/' . $order->created_at->format('m') . '/' . $order->created_at->format('Y'),

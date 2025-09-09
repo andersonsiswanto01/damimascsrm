@@ -95,4 +95,9 @@ public function corporateSp2bks()
     return $this->hasMany(CorporateSp2bks::class);
 }
 
+public function internalCorporate()
+{
+    return $this->belongsTo(InternalCorporate::class, 'internal_corporates_id');
+
 }
+};

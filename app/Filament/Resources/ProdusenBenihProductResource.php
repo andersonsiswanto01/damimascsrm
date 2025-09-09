@@ -22,7 +22,7 @@ class ProdusenBenihProductResource extends Resource
 {
     protected static ?string $model = ProdusenBenihProduct::class;
     protected static ?string $navigationGroup = 'Corporate Analyzer'; // This groups it under 'Corporate Resources'
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static ?string $navigationIcon = 'hugeicons-product-loading';
 
     public static function form(Form $form): Form
     {

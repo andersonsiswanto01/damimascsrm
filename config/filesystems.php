@@ -14,7 +14,7 @@ return [
     */
 
     'default' => env('FILESYSTEM_DISK', 'local'),
-
+    'keyFile' => base_path(env('GOOGLE_APPLICATION_CREDENTIALS')),
     /*
     |--------------------------------------------------------------------------
     | Filesystem Disks

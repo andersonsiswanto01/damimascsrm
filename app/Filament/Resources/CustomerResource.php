@@ -30,14 +30,20 @@ use Filament\Tables\Actions\ActionGroup;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Columns\Layout\Split;
 use Filament\Support\Enums\FontWeight;
+use App\Filament\Exports\ProductExporter;
+use Filament\Tables\Actions\ExportAction;
+use Filament\Forms\Set;
 
 class CustomerResource extends Resource
 {
+
+
+
     protected static ?string $model = Customer::class;
 
     protected static ?string $navigationGroup = 'Customer Lead Management';
     
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static ?string $navigationIcon = 'fluentui-people-audience-24-o';
 
     public static function form(Form $form): Form
     {
@@ -125,6 +131,36 @@ class CustomerResource extends Resource
                                         ->live()
                                         ->columnSpanFull(), // 🔹 Full width
 
+                                    Forms\Components\Select::make('internal_corporates_id')
+                                            ->label('Internal Corporate')
+                                            ->searchable()
+                                            ->preload()
+                                            ->relationship('internalCorporate', 'name') // Still required for saving
+                                            ->getOptionLabelFromRecordUsing(fn ($record) => "{$record->initial} - {$record->name}")
+                                            ->getSearchResultsUsing(function (string $search) {
+                                                return \App\Models\InternalCorporate::query()
+                                                    ->where('initial', 'like', "%{$search}%")
+                                                    ->orWhere('name', 'like', "%{$search}%")
+                                                    ->limit(50)
+                                                    ->get()
+                                                    ->mapWithKeys(fn ($record) => [
+                                                        $record->id => "{$record->initial} - {$record->name}",
+                                                    ]);
+                                            })
+                                          ->columnSpanFull()
+                                           ->hidden(fn ($get) => !in_array($get('status'), ['corporate', 'breeder', 'distributor']))
+                                         ->afterStateUpdated(function ($state, $set) {
+                                            $corporate = \App\Models\InternalCorporate::find($state);
+
+                                            if ($corporate) {
+                                                $set('organization_name', 'Sinarmas Group'); // Auto-fill organization name
+                                                $set('company_name', $corporate->pt_name);
+                                                $set('legal_form', $corporate->legal_form);
+                                            }
+                                        })
+                                        ->live(),
+
+
                                         Forms\Components\Select::make('legal_form')
                                         ->label('Legal Form') // Label untuk form
                                         ->options([
@@ -163,7 +199,7 @@ class CustomerResource extends Resource
                                         ->placeholder('e.g., Sinarmas Agro Resources and Technology (SMART)') // Example input
                                         ->columnSpanFull(),
                                     
-                                    Forms\Components\TextInput::make('organization_name')
+                                Forms\Components\TextInput::make('organization_name')
                                         ->label('Organization Name')
                                         ->placeholder('e.g., Sinarmas Group') // Auto-fill
                                         ->hidden(fn ($get) => !in_array($get('status'), ['corporate', 'breeder', 'distributor']))
@@ -287,7 +323,8 @@ class CustomerResource extends Resource
                                     ->visibility('private')
                                     ->fetchFileInformation(false)
                                     ->preserveFilenames()
-                                    ->nullable(),
+                                    ->nullable()
+                                    ->acceptedFileTypes(['application/pdf']),
 
                                 DatePicker::make('expiry_date')
                                     ->label('Expiry Date'),
@@ -366,13 +403,17 @@ class CustomerResource extends Resource
         return $table
             ->columns([
             Split::make([
-                TextColumn::make('customer_name')->label('Customer')->weight(FontWeight::Bold),
+                TextColumn::make('customer_name')
+                ->label('Customer')
+                ->weight(FontWeight::Bold)
+                ->searchable(),
 
             ])->from('md'),
 
             Split::make([
                 TextColumn::make('status')->label('Status'),
                 TextColumn::make('registration_date')->label('Registered'),
+                TextColumn::make('province.name')->label('Province'),
             TextColumn::make('customer_phone')
                 ->label('Phone')
                 ->getStateUsing(fn ($record) => 
@@ -380,9 +421,30 @@ class CustomerResource extends Resource
                 )
             ])->from('md'),
 
-            TextColumn::make('province.name')->label('Province')->sortable(),
+            TextColumn::make('company_name')
+            ->label('Company')
+            ->searchable(),
+
+            TextColumn::make('internalCorporate.initial')
+                ->label('Internal Corporate')
+                ->searchable()
+                ->getStateUsing(fn ($record) => $record->internalCorporate ? "{$record->internalCorporate->initial} - {$record->internalCorporate->name}" : ''),
+        
             ])
-            ->filters([])
+            ->filters([
+                Tables\Filters\SelectFilter::make('status')
+                    ->options([
+                        'private' => 'Private',
+                        'corporate' => 'Corporate',
+                        'breeder' => 'Breeder',
+                    ]),
+                Tables\Filters\SelectFilter::make('province_id')
+                    ->relationship('province', 'name'),
+            ])
+            ->headerActions([
+            ExportAction::make()
+                ->exporter(ProductExporter::class)
+        ])
             ->actions([
                  ActionGroup::make([
                 Tables\Actions\ViewAction::make(),
