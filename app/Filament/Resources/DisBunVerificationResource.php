@@ -314,33 +314,71 @@ class DisBunVerificationResource extends Resource
             })
             ->modalSubmitAction(false)
             ->modalAlignment(Alignment::Center),
-
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DeleteBulkAction::make(),
+                    Tables\Actions\BulkAction::make('Verify Selected')
+                    ->label('Verify Selected')
+                    ->icon('heroicon-m-check-circle')
+                    ->action(function (Collection $records): void {
+                        
+                        foreach ($records as $record) {
+                            $record->decrementOrderStage('Disbun Verified');
+                            $record->save();
+                        }
+
+                        Notification::make()
+                            ->title('Selected orders have been verified.')
+                            ->success()
+                            ->send();
+
+                    }),
+                    Tables\Actions\BulkAction::make('Reject Selected')
+                    ->label('Reject Selected')
+                    ->color('danger')
+                    ->icon('heroicon-m-x-circle')
+                    ->action(function (Collection $records): void {
+                        foreach ($records as $record) {
+                            $record->incrementOrderStage('Disbun Rejected');
+                            $record->save();
+                        }
+
+                        Notification::make()
+                            ->title('Selected orders have been rejected.')
+                            ->success()
+                            ->send();
+                    }),
                 ]),
                 BulkAction::make('download_documents')
-    ->label('Download PDF Bundle')
-    ->icon('heroicon-m-arrow-down-tray')
-    ->action(function (Collection $records): void {
+                ->label('Download PDF Bundle')
+                ->icon('heroicon-m-arrow-down-tray')
+                ->action(function (Collection $records): void {
         
-    CompileOrderDocuments::dispatch($records, auth()->user());
+                    CompileOrderDocuments::dispatch($records, auth()->id());
 
-    Notification::make()
-        ->title('Document generation started')
-        ->success()
-        ->send();
-        })
-    ->requiresConfirmation()
-    ->deselectRecordsAfterCompletion(),
-            ]);
-    }
+                    Notification::make()
+                        ->title('Document generation started')
+                        ->success()
+                        ->send();
+                        })
+                    ->requiresConfirmation()
+                    ->deselectRecordsAfterCompletion(),
+                            ]);
+                    }
 
     public static function canCreate(): bool
     {
         return false;
     }
+
+     public static function getEloquentQuery(): Builder
+    {
+        return Order::query()
+            ->whereHas('stage', fn ($q) => $q->where('code', 'verifiying_disbun'));
+    }
+    
+
 
     public static function getRelations(): array
     {

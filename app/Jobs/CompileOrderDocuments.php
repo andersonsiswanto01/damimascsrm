@@ -10,6 +10,8 @@ use Illuminate\Queue\SerializesModels;
 use App\Models\Order;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Support\Facades\Storage;
+use Filament\Notifications\Notification;
+use Filament\Notifications\Actions\Action;
 
 class CompileOrderDocuments implements ShouldQueue
 {
@@ -18,9 +20,9 @@ class CompileOrderDocuments implements ShouldQueue
     /**
      * Create a new job instance.
      */
-    public function __construct()
+    public function __construct(    public $records,public int $userId)
     {
-        //
+        
     }
 
     /**
@@ -29,13 +31,16 @@ class CompileOrderDocuments implements ShouldQueue
     public function handle(): void
     {
 
-        $orders = Order::with(['orderMaster.user'])->where('order_stage_id', 5)->get();
 
+        $user = \App\Models\User::find($this->userId);
+
+        $orders = Order::with(['orderMaster.user'])->where('order_stage_id', 5)->get();
+    
         $allHtml = '';
 
         foreach ($orders as $order) {
             $allHtml .= view('pdf.order-documents', [
-                'orders' => $order,
+                'order' => $order,
             ])->render();
         }
 
@@ -43,8 +48,20 @@ class CompileOrderDocuments implements ShouldQueue
 
         // Store the PDF
         $filename = 'compiled-orders-' . now()->format('Ymd_His') . '.pdf';
-        Storage::put("public/compiled/{$filename}", $pdf->output());
+        Storage::disk('public')->put("{$filename}", $pdf->output());
 
-        // Optional: email, notification, or link for download
+
+        Notification::make()
+            ->title('Saved successfully')
+            ->body('The document bundle has been generated and saved successfully. You can download ONCE it using the link below.')
+            ->actions([
+                Action::make('Download PDF')
+                    ->icon('heroicon-m-arrow-down-tray')
+                    ->button()
+                    ->markAsRead()
+                    ->url(url("/download/{$filename}"), shouldOpenInNewTab: true),
+            ])
+    ->sendToDatabase($user);
+
     }
 }

@@ -38,6 +38,9 @@ Route::get('/orders/sd/{order}/pdf', [OrderPdfController::class, 'generatesd'])
     ->name('order.sd.pdf')
     ->middleware('auth');
 
+Route::get('/po-test', function () {
+    return view('pdf.po-test');
+});
 
     Route::get('storage/private/{file}', function ($file) {
         $filePath = storage_path('app/private/' . $file);

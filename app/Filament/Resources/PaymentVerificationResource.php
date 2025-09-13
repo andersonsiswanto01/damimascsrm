@@ -75,8 +75,8 @@ class PaymentVerificationResource extends Resource
                 ->alignCenter(),
          ])
         ->actions([
-            Action::make('accept_document')
-                ->label('Verify Document')
+            Action::make('accept_payment')
+                ->label('Accept Payment')
                 ->color('success')
                 ->icon('heroicon-m-check-circle')
                 ->requiresConfirmation()
@@ -84,6 +84,15 @@ class PaymentVerificationResource extends Resource
                     $record->payment_verified = true;
                     $record->incrementOrderStage('Payment Verified'); // Increment the order stage to 'Payment Verified'
                     $record->save();
+                }),
+
+            Action::make('reject_payment')
+                ->label('Reject Payment')
+                ->color('danger')
+                ->icon('heroicon-m-x-circle')
+                ->requiresConfirmation()
+                ->action(function (OrderMaster $record) {
+                    $record->decrementOrderStage('Payment Declined'); // Increment the order stage to 'Payment Verified'
                 }),
 
                 Action::make('view_documents')

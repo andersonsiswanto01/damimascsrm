@@ -32,14 +32,6 @@ class DeliveryOrderResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
 
-    public static function form(Form $form): Form
-    {
-        return $form
-            ->schema([
-                //
-            ]);
-    }
-
     public static function table(Table $table): Table
     {
         return $table
@@ -67,7 +59,7 @@ class DeliveryOrderResource extends Resource
       ->actions([
     ActionGroup::make([
         Action::make('accept_document')
-            ->label('Verify Document')
+            ->label('Proceed to DisBun Check')
             ->color('success')
             ->icon('heroicon-m-check-circle')
             ->requiresConfirmation()
@@ -214,7 +206,7 @@ class DeliveryOrderResource extends Resource
     public static function getEloquentQuery(): Builder
     {
         return Order::query()
-            ->whereHas('stage', fn ($q) => $q->where('code', 'waiting_shipping'));
+            ->whereHas('stage', fn ($q) => $q->where('code', 'ready_to_deliver'));
     }
     
     public static function getModel(): string
@@ -223,12 +215,16 @@ class DeliveryOrderResource extends Resource
     }
     public static function getNavigationLabel(): string
     {
-        return 'Delivery Orders';
+        return 'Delivery Order Lists';
     }
     public static function getNavigationGroup(): ?string
     {
         return 'Sales';
     }
 
+    public static function getNavigationSort(): ?int
+{
+    return 2; // lower number = higher up in the sidebar
+}
 
 }

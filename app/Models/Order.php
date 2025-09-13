@@ -144,7 +144,7 @@ public function orderMaster()
 }
 
 
-public function incrementOrderStage(string $notes = null): void
+public function incrementOrderStage(?string $notes = null): void
 {
     $maxStageId = OrderStage::max('id');
 
@@ -163,7 +163,7 @@ public function incrementOrderStage(string $notes = null): void
     ]);
 }
     
-public function decrementOrderStage(string $notes = null): void
+public function decrementOrderStage(?string $notes = null): void
 {
     $minStageId = OrderStage::min('id');
 

@@ -21,6 +21,7 @@ use Filament\Forms\Components\Grid;
 use Filament\Tables\Actions\ActionGroup;
 use Filament\Pages\Actions\Action;
 use Filament\Notifications\Notification;
+use Illuminate\Database\Eloquent\Collection;
 
 class OrderResource extends Resource
 {
@@ -147,7 +148,16 @@ class OrderResource extends Resource
                                         $clean = preg_replace('/[^0-9]/', '', $state);
                                         $set('product_price', $clean);
                                     }),
-        
+
+                                    TextInput::make('free_allowance_percentage')
+                                    ->label('Free Allowance (%)')
+                                    ->numeric()
+                                    ->minValue(0)
+                                    ->maxValue(100)
+                                    ->step(0.01)
+                                    ->suffix('%')
+                                    ->required()
+                                    ->default(5),// default only for new records
                             ])
                             ->reactive()
                             ->live()
@@ -400,14 +410,18 @@ class OrderResource extends Resource
                 ->filters([
                     Tables\Filters\SelectFilter::make('order_stage_id')
                         ->label('Order Status')
+                        ->multiple()
                         ->options([
                             '1' => 'Menunggu Dokument Lengkap',
                             '2' => 'Sedang Verifikasi Dokumen',
                             '3' => 'Menunggu Pembayaran',
-                            '4' => 'Menunggu Pengiriman',
-                            '5' => 'Persiapan Kirim',
-                            '6' => 'Selesai',
-                            '7' => 'Batal',
+                            '4' => 'Sedang Dalam Antrian',
+                            '5' => 'Sedang Verifikasi DisBun',
+                            '6' => 'Menunggu PO',
+                            '7' => 'Siap Dikirim',
+                            '8' => 'Sudah Dikirim',
+                            '9' => 'Perlu Revisi Dokument',
+                            '10' => 'Batal',
                         ]),
                 ])
             
@@ -452,10 +466,42 @@ class OrderResource extends Resource
                 ])
                 ->bulkActions([
                     Actions\DeleteBulkAction::make(),
-                ]);
+                    Actions\BulkAction::make('showTotal')
+                ->label('Show Total')
+                ->action(function (Collection $records) {
+                    foreach ($records as $order) {
+            foreach ($order->orderProducts as $product) {
+                $pid = $product->product_id;
+                $pname = $product->product->name ?? 'Unknown Product';
+
+                if (! isset($totals[$pid])) {
+                    $totals[$pid] = [
+                        'product_id'   => $pid,
+                        'product_name' => $pname,
+                        'sum_qty'      => 0,
+                    ];
+                }
+
+                $totals[$pid]['sum_qty'] += $product->qty;
+            }
 
             
-    }
+        }   
+
+                     // Build notification body
+            $body = collect($totals)
+                ->map(fn ($item) => "{$item['product_name']} : {$item['sum_qty']}")
+                ->implode("\n");
+
+        Notification::make()
+            ->title('Total Quantity by Product')
+            ->body($body)
+            ->success()
+            ->send();
+                }),
+                ]);
+
+            }
 
     public static function canCreate(): bool
 {

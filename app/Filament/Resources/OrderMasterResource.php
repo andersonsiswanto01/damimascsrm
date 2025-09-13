@@ -566,6 +566,13 @@ class OrderMasterResource extends Resource
                                         $clean = preg_replace('/[^0-9]/', '', $state);
                                         $set('product_price', $clean);
                                     }),
+                                    
+                                    TextInput::make('free_allowance_percentage')
+                                    ->label('Free Allowance Percentage')
+                                    ->numeric()
+                                    ->suffix('%')
+                                    ->default(5)
+                                    ->step(0.01) // allows 2 decimal places
         
                             ])
                             ->reactive()

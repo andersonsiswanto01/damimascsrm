@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class OrderProduct extends Model
 {
-    protected $fillable = ['order_id', 'product_id', 'qty','product_price'];
+    protected $fillable = ['order_id', 'product_id', 'qty','product_price', 'free_allowance', 'free_allowance_percentage'];
 
     public function order()
     {
@@ -20,15 +20,23 @@ class OrderProduct extends Model
     }
 
     protected static function booted()
-    {
-        static::created(function ($orderProduct) {
-            // ✅ Automatically insert into order_quantity_history
-            \App\Models\OrderQuantityHistory::create([
-               'order_product_id' => $orderProduct->id,
-                'allocated_date' => now(), // Set current date for allocation
-                'allocated_quantity' => $orderProduct->qty, // Allocate full quantity
-                'remaining_balance' => $orderProduct->qty, // Initially, remaining balance is full quantity
-            ]);
-        });
-    }
+        {
+
+            static::saving(function ($orderProduct) {
+
+                $percent = $orderProduct->free_allowance_percentage ?? 0;
+                $orderProduct->free_allowance = round($orderProduct->qty * ($percent / 100));
+
+            });
+            
+            static::created(function ($orderProduct) {
+                // ✅ Automatically insert into order_quantity_history after record exists
+                \App\Models\OrderQuantityHistory::create([
+                    'order_product_id'   => $orderProduct->id,
+                    'allocated_date'     => now(),
+                    'allocated_quantity' => $orderProduct->qty,
+                    'remaining_balance'  => $orderProduct->qty,
+                ]);
+            });
+        }
 }
