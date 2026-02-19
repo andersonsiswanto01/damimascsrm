@@ -31,6 +31,8 @@ use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\FileUpload;
 use Filament\Tables\Actions\Action;
 use Filament\Support\Enums\Alignment;
+use App\Models\OrderProduct;
+use App\Models\OrderPayment;
 
 class DisBunVerificationResource extends Resource
 {
@@ -324,7 +326,7 @@ class DisBunVerificationResource extends Resource
                     ->action(function (Collection $records): void {
                         
                         foreach ($records as $record) {
-                            $record->decrementOrderStage('Disbun Verified');
+                            $record->incrementOrderStage('Disbun Verified');
                             $record->save();
                         }
 
@@ -340,7 +342,7 @@ class DisBunVerificationResource extends Resource
                     ->icon('heroicon-m-x-circle')
                     ->action(function (Collection $records): void {
                         foreach ($records as $record) {
-                            $record->incrementOrderStage('Disbun Rejected');
+                            $record->revisionDocument('Disbun Rejected');
                             $record->save();
                         }
 
@@ -374,8 +376,25 @@ class DisBunVerificationResource extends Resource
 
      public static function getEloquentQuery(): Builder
     {
-        return Order::query()
-            ->whereHas('stage', fn ($q) => $q->where('code', 'verifiying_disbun'));
+         return Order::query()
+        // ✅ filter by document verification
+        ->whereHas('orderDocumentStage', fn ($q) =>
+            $q->where('code', 'verifying_disbun')
+        )
+
+        ->addSelect([
+            'total_product_value' => OrderProduct::selectRaw('SUM(product_price * qty)')
+                ->whereColumn('order_id', 'orders.id')
+        ])
+
+        ->addSelect([
+            'total_payment_value' => OrderPayment::selectRaw('SUM(amount)')
+                ->whereColumn('order_master_id', 'orders.order_master_id')
+                ->where('order_payment_stage_id', '2')
+        ])
+
+        // ✅ only include orders fully paid
+        ->havingRaw('total_payment_value >= total_product_value');
     }
     
 

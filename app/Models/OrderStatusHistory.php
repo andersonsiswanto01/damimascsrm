@@ -10,6 +10,7 @@ class OrderStatusHistory extends Model
     protected $fillable = [
         'order_id',
         'order_stage_id',
+        'order_document_stage_id',
         'note',
         'changed_by',
     ];
@@ -18,6 +19,11 @@ class OrderStatusHistory extends Model
     public function order(): BelongsTo
     {
         return $this->belongsTo(Order::class);
+    }
+
+    public function orderDocumentStage(): BelongsTo
+    {
+        return $this->belongsTo(OrderDocumentStage::class, 'order_document_stage_id');
     }
 
     public function stage(): BelongsTo

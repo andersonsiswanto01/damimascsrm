@@ -28,6 +28,7 @@ use Google\Cloud\DocumentAI\V1\ProcessRequest;
 use Filament\Tables\Actions\BulkAction;
 use App\Models\DocumentResponse;
 use App\Jobs\ProcessDocumentBatchJob;
+use Filament\Notifications\Notification;
 
 class OrderDocumentVerificationResource extends Resource
 {
@@ -219,15 +220,13 @@ foreach ($documents as $type => $config) {
                 ->color('success')
                 ->icon('heroicon-m-check-circle')
                 ->requiresConfirmation()
-                ->action(function ($record) {
+                ->action(function (Order $record) {
+                    $record->incrementOrderStage('Document Verified');
 
-                    // First increment: Confirm document verification
-                    $record->incrementOrderStage('confirmed! Verifying Payment');
-                    // Check related orderMaster payment_status
-                    if ($record->orderMaster->payment_verified == 1) {
-                        // Second increment: Because payment is already confirmed
-                        $record->incrementOrderStage('payment already confirmed, skipping...');
-                    }
+                    Notification::make()
+                        ->title('Document Has Been Verified')
+                        ->success() // styles it as green ✅
+                        ->send();
                 }),
         
             Action::make('view_documents')
@@ -239,6 +238,10 @@ foreach ($documents as $type => $config) {
                         ->label('Customer')
                         ->default($record->customer_name ?? '-')
                         ->disabled(),
+
+                    TextInput::make('orderProduct')
+                        ->label('Products Ordered'),
+                        // ->default(function),
                     
                     FileUpload::make('KTP_photo')
                         ->image()
@@ -303,7 +306,7 @@ foreach ($documents as $type => $config) {
                         ->required(),
                 ])
                 ->action(function ($record, array $data) {
-                    $record->decrementOrderStage($data['notes'] ?? 'Returned by admin');
+                    $record->revisionDocument($data['notes'] ?? 'Returned by admin');
                 }),
         ])
         ->bulkActions([
@@ -326,10 +329,12 @@ foreach ($documents as $type => $config) {
         ];
     }
 
-    public static function getEloquentQuery(): Builder
+public static function getEloquentQuery(): Builder
 {
     return Order::query()
-        ->whereHas('stage', fn ($q) => $q->where('code', 'verifying_docs'));
+        ->whereHas('orderDocumentStage', function ($q) {
+            $q->where('code', 'verifying_docs');
+        });
 }
 
 public static function getModel(): string

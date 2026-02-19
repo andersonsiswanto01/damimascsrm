@@ -90,9 +90,9 @@ class Customer extends Model
     return $this->morphMany(SalesInteractionParticipant::class, 'participant');
 }
 
-public function corporateSp2bks()
+public function corporateSp2bk()
 {
-    return $this->hasMany(CorporateSp2bks::class);
+    return $this->hasMany(CorporateSp2bk::class);
 }
 
 public function internalCorporate()

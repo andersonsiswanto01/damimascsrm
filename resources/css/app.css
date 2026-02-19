@@ -1,7 +1,5 @@
-@import "tailwindcss";
-@import "flowbite";
-@plugin "flowbite/plugin";
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
-@tailwind variants;
+.custom-list li::marker {
+  content: "• ";
+  color: green;
+  font-size: 15 px;
+}

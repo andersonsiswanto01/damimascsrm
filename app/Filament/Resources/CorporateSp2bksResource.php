@@ -16,10 +16,11 @@ use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
+use App\Models\CorporateSp2bk;
 
 class CorporateSp2bksResource extends Resource
 {
-    protected static ?string $model = CorporateSp2bks::class;
+    protected static ?string $model = CorporateSp2bk::class;
     protected static ?string $navigationGroup = 'Corporate Analyzer'; // This groups it under 'Corporate Resources'
     protected static ?string $navigationIcon = 'heroicon-o-document-text';
 

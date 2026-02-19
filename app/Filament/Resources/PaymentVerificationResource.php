@@ -16,8 +16,7 @@ use Filament\Tables\Actions\Action;
 use Filament\Tables\Columns\TextColumn;
 use App\Models\Order;
 
-
-use App\Models\OrderMaster;
+use App\Models\OrderPayment;
 use App\Models\OrderStage;
 use App\Models\User;
 use Filament\Forms\Components\FileUpload;
@@ -25,6 +24,7 @@ use Filament\Forms\Components\Placeholder;
 use Filament\Support\Enums\Alignment;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Textarea;
+use Filament\Notifications\Notification;
 
 class PaymentVerificationResource extends Resource
 {
@@ -52,27 +52,23 @@ class PaymentVerificationResource extends Resource
     {
         return $table
         ->columns([
-            TextColumn::make('id')->label('Order ID')->sortable(),
-            TextColumn::make('customer.customer_name')->label('Customer Name'),
-            TextColumn::make('total_order_price')
-                ->label('Total Price')
+            TextColumn::make('id')->label('Payment ID')->sortable(),
+            TextColumn::make('orderMaster.customer.customer_name')->label('Customer Name'),
+            TextColumn::make('payment_amount')
+                ->label('Payment Amount')
                 ->getStateUsing(function ($record) {
-                    $totalPrice = 0;
 
-                    // Iterate through each order
-                    foreach ($record->orders as $order) {
-                        // Iterate through each product in the order
-                        foreach ($order->orderProducts as $product) {
-                            // Add the product of price and quantity to totalPrice
-                            $totalPrice += $product->product_price * $product->qty;
-                        }
-                    }
-
-                    // Return the total price formatted as Rupiah
-                    return number_format($totalPrice, 0, ',', '.');
+                    return number_format($record->amount, 0, ',', '.');
                 })
                 ->prefix('Rp. ') // Add Rupiah symbol as a prefix
                 ->alignCenter(),
+
+            TextColumn::make('payment_type')
+                ->label('Payment Type')
+                ->getStateUsing(function ($record) {
+                    return $record->paymentType->name ?? 'N/A';
+                })
+
          ])
         ->actions([
             Action::make('accept_payment')
@@ -80,10 +76,13 @@ class PaymentVerificationResource extends Resource
                 ->color('success')
                 ->icon('heroicon-m-check-circle')
                 ->requiresConfirmation()
-                ->action(function (OrderMaster $record) {
-                    $record->payment_verified = true;
-                    $record->incrementOrderStage('Payment Verified'); // Increment the order stage to 'Payment Verified'
+                ->action(function (OrderPayment $record) {
+                    $record->incrementOrderStage(); // Increment the order stage to 'Payment Verified'
                     $record->save();
+                    Notification::make()
+                        ->title('Payment Has Been Verified')
+                        ->success() // styles it as green ✅
+                        ->send();
                 }),
 
             Action::make('reject_payment')
@@ -91,43 +90,46 @@ class PaymentVerificationResource extends Resource
                 ->color('danger')
                 ->icon('heroicon-m-x-circle')
                 ->requiresConfirmation()
-                ->action(function (OrderMaster $record) {
-                    $record->decrementOrderStage('Payment Declined'); // Increment the order stage to 'Payment Verified'
+                ->action(function (OrderPayment $record) {
+                    $record->rejectOrderStage(); // Increment the order stage to 'Payment Verified'
+                Notification::make()
+                        ->title('Payment Has Been Rejected')
+                        ->danger() // styles it as red ❌
+                        ->send();
                 }),
 
-                Action::make('view_documents')
+               Action::make('view_documents')
                 ->label('View Documents')
                 ->icon('heroicon-o-eye')
                 ->color('warning')
-                ->form(function (OrderMaster $record) {
+                ->form(function (OrderPayment $record) {
                     return [
+                        // Customer Name
                         TextInput::make('customer_id')
                             ->label('Customer')
-                            ->default($record->customer->customer_name) // Populate customer_name from the record
-                            ->readOnly(),
-                        
-                
-                        FileUpload::make('payment_picture')
+                            ->default($record->orderMaster->customer->customer_name ?? '-') // safe fallback
+                            ->disabled(), // readOnly alternative
+
+                        // Payment Proofs
+                        FileUpload::make('payment_proof')
+                            ->label('Payment Proof')
                             ->image()
                             ->imageEditor()
                             ->downloadable()
+                            ->openable()
                             ->disk('local')
-                            ->acceptedFileTypes(['image/jpeg', 'image/png', 'application/pdf'])
-                            ->maxSize(2048)
                             ->directory('private/documents')
                             ->visibility('private')
-                            ->openable()
-                            ->fetchFileInformation(false)
-                            ->acceptedFileTypes(['image/*'])
-                            ->label('Payment Proof')
                             ->multiple()
                             ->nullable()
-                            ->default(fn ($record) => $record?->payment_picture ?? []),// Populate landcertificate_photo from the record
-                
+                            ->fetchFileInformation(false)
+                            ->acceptedFileTypes(['image/jpeg', 'image/png', 'application/pdf'])
+                            ->default(fn ($record) => $record?->payment_proof ?? []),
                     ];
                 })
-                ->modalSubmitAction(false) // 🚫 hides the submit button
+                ->modalSubmitAction(false) // hide submit button
                 ->modalAlignment(Alignment::Center),
+
 
         ]);
     }
@@ -136,29 +138,46 @@ class PaymentVerificationResource extends Resource
     public static function getRelations(): array
     {
         return [
-            //
+            
         ];
     }
 
-    public static function getEloquentQuery(): Builder
-    {
-        return OrderMaster::query()
-            ->where('payment_verified', false)
-            ->with([
-                'orders.orderProducts', // <-- eager loads all orders and their products
-            ]);;
-    }
+ public static function getEloquentQuery(): Builder
+{
+    return parent::getEloquentQuery() // important to keep default Filament filters
+        ->with([
+            'orderMaster.orders.orderProducts', // eager load products too if needed
+            'orderMaster.customer', // if you want customer data
+        ])
+        ->where('order_payment_stage_id', 1); // only show payments pending verification
+}
     
     
     public static function getModel(): string
     {
-        return \App\Models\OrderMaster::class;
+        return \App\Models\OrderPayment::class;
     }
 
     public static function getNavigationLabel(): string
 {
     return 'Payment Verification';
 }
+
+public static function getNavigationBadge(): ?string
+{
+    // Count all records that match the same condition as your table query
+    $count = static::getModel()::where('order_payment_stage_id', 1)->count();
+
+    // Only show badge if there are pending verifications
+    return $count > 0 ? (string) $count : null;
+}
+
+public static function getNavigationBadgeColor(): ?string
+{
+    // You can use 'danger', 'warning', 'primary', 'success', or 'info'
+    return 'warning';
+}
+
 
 
     public static function getPages(): array

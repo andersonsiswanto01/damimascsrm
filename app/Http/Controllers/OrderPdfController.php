@@ -21,48 +21,45 @@ class OrderPdfController extends Controller
         }
     }
 
-    public function generatepi(Order $order)
+    public function generatepi (OrderMaster $order)
     {
 
-        // dd($order);
+        $order->load(['customer', 'orders.orderProducts.product']); 
 
-        $this->authentication($order->order_stage_id);
-        $order->load(['customer', 'orderProducts.product', 'orderMaster.customer']);
-        $customerName = $order->orderMaster->customer->customer_name;
-        $orderProducts = $order->orderProducts;
+        $productDetails = [];
+        $total = 0;
+        $totalqty = 0;
 
+        foreach ($order->orders as $singleOrder) {
+            foreach ($singleOrder->orderProducts as $orderProduct) {
+                $lineTotal = $orderProduct->product_price * $orderProduct->qty;
+                $lineTotalQty = $orderProduct->qty;
 
-        $totalQty = $orderProducts->sum('qty');
-        $totalPrice = $orderProducts->sum(function ($orderProducts) {
-            return $orderProducts->qty * $orderProducts->product->price;
-        });
-        $totalPriceTerbilang = ucwords(Terbilang::convert($totalPrice));
-
-        foreach ($order->orderProducts as $orderProduct) {
-
-            $this->productDetails[] = [
-                'name' => $orderProduct->product->name, // or 'name' depending on your column name
-                'price' => $orderProduct->product_price,
+                $productDetails[] = [
+                    'name'  => $orderProduct->product->name,
+                    'price' => $orderProduct->product_price,
+                    'qty'   => $orderProduct->qty,
+                    'total' => $lineTotal,
                 ];
+
+                $total += $lineTotal;
+                $totalqty += $lineTotalQty;
             }
+        }
 
 
-        $productPriceFormarted = number_format(
-            $orderProducts->sum(function ($orderProduct) {
-                return $orderProduct->product->price;
-            }),
-            2, ',', '.'
-        );
-        $totalPriceFormarted = number_format(
-            $orderProducts->sum(function ($orderProduct) {
-                return $orderProduct->qty * $orderProduct->product->price;
-            }),
-            2, ',', '.'
-        );
+        $grandTotal = number_format($total, 0, ',', '.');
+
+
+
+        $totalPriceTerbilang = ucwords(Terbilang::convert($total));
         
-        $companyName = $order->orderMaster->customer->company_name;
+        
+        if ($order->customer->status === 'corporate') {
+          
+        $companyName = $order->customer->company_name;
 
-        $legalForm = $order->orderMaster->customer->legal_form;
+        $legalForm = $order->customer->legal_form;
 
         $formattedLegalForm = match ($legalForm) {
             'pt_tbk' => 'PT ' . $companyName . ' Tbk',
@@ -73,7 +70,7 @@ class OrderPdfController extends Controller
              default => $legalForms[$legalForm] . ' ' . $companyName,
         };
         
-        
+    };
         // Step 1: Define the path to your private image (e.g., signature image)
         $imagePath = storage_path('app/private/signature/musachandra.png');
 
@@ -90,22 +87,22 @@ class OrderPdfController extends Controller
         // Step 5: Use this base64 string in your Blade view (or wherever you need to display the image)
         $data = [
             'orderNumber' => $order->id . '/DIR/SUS/' . $order->created_at->format('m') . '/' . $order->created_at->format('Y'),
-            'customerName' => $customerName,
-            'qty' => $totalQty,
-            'totalPrice' => $totalPriceFormarted,
+            'customerName' => $order->customer->customer_name,
+            'qty' => $totalqty,
+            'totalPrice' => $grandTotal,
             'totalPriceTerbilang' => $totalPriceTerbilang,
             'date' => $order->created_at->translatedFormat('d F Y'),
-            'productDetails' => $this->productDetails,
-            'corporate' => $formattedLegalForm,
-            'regency'=> $order->orderMaster->customer->regency->name,
-            'province'=> $order->orderMaster->customer->province->name,
+            'productDetails' => $productDetails, // Set of arrays
+            'corporate' => $formattedLegalForm ?? null,
+            'regency'=> $order->customer->regency->name,
+            'province'=> $order->customer->province->name,
             'signature' => $signatureBase64,
         ];
 
-        if ($order->orderMaster->customer->status === 'corporate') {
+        if ($order->customer->status === 'corporate') {
             $pdf = Pdf::loadView('pdf.picorporate', $data)
                 ->setPaper('A4', 'portrait');
-        } elseif (in_array($order->orderMaster->customer->status, ['private', 'breeder'])) {
+        } elseif (in_array($order->customer->status, ['private', 'breeder'])) {
             $pdf = Pdf::loadView('pdf.piprivate', $data) // <- note: you probably meant piprivate here
                 ->setPaper('A4', 'portrait');
         } else {
@@ -113,7 +110,7 @@ class OrderPdfController extends Controller
         }
       
 
-        return $pdf->stream('PI_' . $order->orderMaster->customer->customer_name . '.pdf');
+        return $pdf->stream('PI_' . $order->customer->customer_name . '.pdf');
     }
 
     public function generatesd(OrderMaster $order)

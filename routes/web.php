@@ -13,8 +13,12 @@ use App\Http\Controllers\DownloadController;
 // Route::view('/', 'welcome');
 
 Route::get('/', function () {
-    return view('app'); // Assuming your homepage Blade file is resources/views/home.blade.php
-});
+    return view('app');
+})->name('home');
+
+Route::get('about', function () {
+    return view('about'); // Assuming your about page Blade file is resources/views/about.blade.php
+})->name('about');
 
 // Route::view('dashboard', 'dashboard')
 //     ->middleware(['auth', 'verified'])
@@ -24,23 +28,25 @@ Route::get('/', function () {
 //     ->middleware(['auth'])
 //     ->name('profile');
 
-    Route::get('order-upload/{order}', PublicSalesForm::class)->name('order.upload');
+
 
 Route::get('customer-photo/{filename}', function ($filename) {
     return response()->file(storage_path("app/private/private/documents/$filename"));
 })->middleware('auth')->name('customer.photo');
 
-Route::get('/orders/pi/{order}/pdf', [OrderPdfController::class, 'generatepi'])
-    ->name('order.pi.pdf')
-    ->middleware('auth');
-
 Route::get('/orders/sd/{order}/pdf', [OrderPdfController::class, 'generatesd'])
     ->name('order.sd.pdf')
+    ->middleware('auth');
+
+Route::get('/orders/pi/{order}/pdf', [OrderPdfController::class, 'generatepi'])
+    ->name('order.pi.pdf')
     ->middleware('auth');
 
 Route::get('/po-test', function () {
     return view('pdf.po-test');
 });
+
+Route::get('order-upload/{order}', PublicSalesForm::class)->name('order.upload');
 
     Route::get('storage/private/{file}', function ($file) {
         $filePath = storage_path('app/private/' . $file);

@@ -1,142 +1,397 @@
 @include('header')
-<main class="max-w-7xl mx-auto px-4 py-0 flex-grow" style="
-                padding-right: 0px;
-                padding-left: 0px;
-                ">
-    <section class="bg-white pt-4 pb-8 antialiased md:pt-6 md:pb-12"
-    <!-- FULL-WIDTH BACKGROUND -->
-    <section class="w-full relative bg-cover bg-center bg-no-repeat pt-4 pb-0 md:pt-6 md:pb-12 rounded-2xl overflow-hidden"
-    style="background-image: url('{{ asset('landing/background.jpg') }}');">
 
-    <div class="mx-auto grid max-w-screen-l px-8 pb-8 md:grid-cols-12 md:px-16 md:pb-0 lg:gap-12 xl:gap-0">
-            <div class="content-center justify-self-start md:col-span-7 md:text-start">
-                <p class="mb-4 max-w-2xl font-bold text-white  md:text-lg lg:text-xl sm:mt-8 md:mt-0" style="transform: translateY(0);">
-                    Hasil yang Luar Biasa Bermula dari Awal yang Baik
+<main class="container-xl px-0 flex-grow-1">
+  
+  <section class="bg-white pt-4 pb-5 pt-md-5 pb-md-5">
+
+    
+
+<div id="myCarousel" class="carousel slide mb-6" data-bs-ride="carousel">
+        <div class="carousel-indicators">
+          <button
+            type="button"
+            data-bs-target="#myCarousel"
+            data-bs-slide-to="0"
+            class="active"
+            aria-current="true"
+            aria-label="Slide 1"
+          ></button>
+          <button
+            type="button"
+            data-bs-target="#myCarousel"
+            data-bs-slide-to="1"
+            aria-label="Slide 2"
+          ></button>
+          <button
+            type="button"
+            data-bs-target="#myCarousel"
+            data-bs-slide-to="2"
+            aria-label="Slide 3"
+          ></button>
+        </div>
+        <div class="carousel-inner">
+          <div class="carousel-item active">
+            <svg
+              aria-hidden="true"
+              class="bd-placeholder-img"
+              height="100%"
+              preserveAspectRatio="xMidYMid slice"
+              width="100%"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <rect
+                width="100%"
+                height="100%"
+                fill="var(--bs-secondary-color)"
+              ></rect>
+            </svg>
+            <div class="container">
+              <div class="carousel-caption text-start">
+                <h1>Example headline.</h1>
+                <p class="opacity-75">
+                  Some representative placeholder content for the first slide of
+                  the carousel.
                 </p>
-                <h1 class="mb-2 text-4xl text-white font-extrabold leading-none tracking-tight md:max-w-2xl md:text-5xl xl:text-6xl" 
-                    style="transform: translateY(0);">
-                    Dan awal yang baik adalah tanam <br> Dami Mas!
-                </h1>
-
-                <a href="#pesan"
-                class="inline-flex items-center justify-center py-4 mt-5 px-8 text-white font-semibold text-xl rounded-lg transition duration-300 transform hover:scale-105 hover:shadow-xl"
-                style="background-color: rgb(237, 28, 36);">
-                    Pesan Sekarang
-                </a>
+                <p>
+                  <a class="btn btn-lg btn-primary" href="#">Sign up today</a>
+                </p>
+              </div>
+            </div>
           </div>
-          <div class="hidden md:col-span-5 md:mt-0 md:flex">
+          <div class="carousel-item">
+            <svg
+              aria-hidden="true"
+              class="bd-placeholder-img"
+              height="100%"
+              preserveAspectRatio="xMidYMid slice"
+              width="100%"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <rect
+                width="100%"
+                height="100%"
+                fill="var(--bs-secondary-color)"
+              ></rect>
+            </svg>
+            <div class="container">
+              <div class="carousel-caption">
+                <h1>Another example headline.</h1>
+                <p>
+                  Some representative placeholder content for the second slide
+                  of the carousel.
+                </p>
+                <p><a class="btn btn-lg btn-primary" href="#">Learn more</a></p>
+              </div>
+            </div>
+          </div>
+          <div class="carousel-item">
+            <svg
+              aria-hidden="true"
+              class="bd-placeholder-img"
+              height="100%"
+              preserveAspectRatio="xMidYMid slice"
+              width="100%"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <rect
+                width="100%"
+                height="100%"
+                fill="var(--bs-secondary-color)"
+              ></rect>
+            </svg>
+            <div class="container">
+              <div class="carousel-caption text-end">
+                <h1>One more for good measure.</h1>
+                <p>
+                  Some representative placeholder content for the third slide of
+                  this carousel.
+                </p>
+                <p>
+                  <a class="btn btn-lg btn-primary" href="#">Browse gallery</a>
+                </p>
+              </div>
+            </div>
           </div>
         </div>
-      </section>
+        <button
+          class="carousel-control-prev"
+          type="button"
+          data-bs-target="#myCarousel"
+          data-bs-slide="prev"
+        >
+          <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+          <span class="visually-hidden">Previous</span>
+        </button>
+        <button
+          class="carousel-control-next"
+          type="button"
+          data-bs-target="#myCarousel"
+          data-bs-slide="next"
+        >
+          <span class="carousel-control-next-icon" aria-hidden="true"></span>
+          <span class="visually-hidden">Next</span>
+        </button>
+      </div>
 
-<div class="flex flex-wrap justify-center gap-6 p-6 bg-gray-50">
-        <!-- Card 1: Benih Unggul -->
-<div class="card">
-  <div class="card-inner">
-    <!-- Front -->
-    <div class="card-front">
-      <h5 class="card-title">Panen Perdana Lebih Awal</h5>
-      <p class="card-text"></p>
-    </div>
 
-    <!-- Back -->
-    <div class="card-back">
-      <h5 class="card-title"></h5>
-      <p class="card-text">Persilangan Deli Dura x Pisifera Avros memiliki keunggulan Quick Starter. DImana Pekebun sawi tbisa panen perdana lebih cepat di usia 24 bulan</p>
-    </div>
-  </div>
-</div>
-    
-        <!-- Card 2: Harga Terjangkau -->
-    <div class="card">
-  <div class="card-inner">
-    <!-- Front -->
-    <div class="card-front">
-      <h5 class="card-title">Front Side</h5>
-      <p class="card-text">This side is visible initially.</p>
-    </div>
+<section class="bg-light py-5">
 
-    <!-- Back -->
-    <div class="card-back">
-      <h5 class="card-title">Back Side</h5>
-      <p class="card-text">This side appears on hover.</p>
-    </div>
-  </div>
-</div>
-    
-        <!-- Card 3: Pengiriman Aman -->
-        <div class="group relative w-64 h-64 bg-white  rounded-2xl shadow-lg overflow-hidden transition-all duration-300 hover:-translate-y-2 hover:shadow-xl cursor-pointer">
-            <div class="absolute inset-0 flex items-center justify-center p-4 transition-opacity duration-300 group-hover:opacity-0">
-                <p class="text-center font-semibold text-2xl text-gray-800 ">Pengiriman Aman</p>
-            </div>
-            <div class="absolute inset-0 flex items-center justify-center p-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-white/90 ">
-                <p class="text-center text-lg text-gray-700 ">Packing khusus & kerjasama dengan PT POS ke seluruh Indonesia.</p>
-            </div>
-        </div>
-    
-        <!-- Card 4: Legal & Resmi -->
-        <div class="group relative w-64 h-64 bg-white rounded-2xl shadow-lg overflow-hidden transition-all duration-300 hover:-translate-y-2 hover:shadow-xl cursor-pointer">
-            <div class="absolute inset-0 flex items-center justify-center p-4 transition-opacity duration-300 group-hover:opacity-0">
-                <p class="text-center font-semibold text-2xl text-gray-800 ">Legal & Resmi</p>
-            </div>
-            <div class="absolute inset-0 flex items-center justify-center p-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-white/90 ">
-                <p class="text-center text-lg text-gray-700">Dari Dami Mas resmi, pembayaran via PT Sawit Unggul Sakti.</p>
-            </div>
-        </div>
-    
-    
-      
-    <h1 class="mb-4 text-center mt-10 text-4xl font-extrabold leading-none tracking-tight text-grey md:text-5xl lg:text-6xl "> Kawan Dami Mas</h1>
-    
+  <!-- Section Title -->
+  <h1 class="text-center fw-extrabold display-6 display-md-5 display-lg-4 mt-4 mb-5">
+    Mengapa Memilih Dami Mas?
+  </h1>
 
-    <div class="w-full bg-white py-4 marquee-container mt-10">
-      
-        <div class="marquee-track">
-          <!-- Group of brand names, duplicated for looping -->
-          <div class="flex gap-12 px-4">
-            <div class="bg-gray-100 rounded-xl shadow px-6 py-3 text-gray-800 font-medium whitespace-nowrap">
-                PT Agro Sejahtera
-              </div>
-              <div class="bg-gray-100 rounded-xl shadow px-6 py-3 text-gray-800 font-medium whitespace-nowrap">
-                CV Tani Jaya
-              </div>
-              <div class="bg-gray-100 rounded-xl shadow px-6 py-3 text-gray-800 font-medium whitespace-nowrap">
-                UD Sawit Makmur
-              </div>
-              <div class="bg-gray-100 rounded-xl shadow px-6 py-3 text-gray-800 font-medium whitespace-nowrap">
-                KSU Karya Bersama
-              </div>
-              <div class="bg-gray-100 rounded-xl shadow px-6 py-3 text-gray-800 font-medium whitespace-nowrap">
-                PT Nusantara Palm
-              </div>
-              <div class="bg-gray-100 rounded-xl shadow px-6 py-3 text-gray-800 font-medium whitespace-nowrap">
-                CV Bumi Hijau
-              </div>
-          </div>
-          <div class="flex gap-12 px-4">
-            <!-- Duplicate the same content for seamless looping -->
-            <div class="bg-gray-100 rounded-xl shadow px-6 py-3 text-gray-800 font-medium whitespace-nowrap">
-                PT Agro Sejahtera
-              </div>
-              <div class="bg-gray-100 rounded-xl shadow px-6 py-3 text-gray-800 font-medium whitespace-nowrap">
-                CV Tani Jaya
-              </div>
-              <div class="bg-gray-100 rounded-xl shadow px-6 py-3 text-gray-800 font-medium whitespace-nowrap">
-                UD Sawit Makmur
-              </div>
-              <div class="bg-gray-100 rounded-xl shadow px-6 py-3 text-gray-800 font-medium whitespace-nowrap">
-                KSU Karya Bersama
-              </div>
-              <div class="bg-gray-100 rounded-xl shadow px-6 py-3 text-gray-800 font-medium whitespace-nowrap">
-                PT Nusantara Palm
-              </div>
-              <div class="bg-gray-100 rounded-xl shadow px-6 py-3 text-gray-800 font-medium whitespace-nowrap">
-                CV Bumi Hijau
-              </div>
+  <!-- Cards -->
+  <div class="container">
+    <div class="row justify-content-center g-4">
+
+      <!-- Card 1 -->
+      <div class="col-12 col-sm-6 col-lg-3">
+        <div class="flip-card h-100">
+          <div class="flip-card-inner">
+
+            <div class="flip-card-front d-flex align-items-center justify-content-center text-center">
+              <h5 class="fw-semibold fs-4 text-dark">Benih Unggul</h5>
+            </div>
+
+            <div class="flip-card-back d-flex align-items-center justify-content-center text-center p-3">
+              <p class="mb-0">
+                Persilangan Deli Dura × Pisifera Avros dengan keunggulan Quick Starter,
+                panen perdana lebih cepat ±24 bulan.
+              </p>
+            </div>
+
           </div>
         </div>
       </div>
 
+      <!-- Card 2 -->
+      <div class="col-12 col-sm-6 col-lg-3">
+        <div class="flip-card h-100">
+          <div class="flip-card-inner">
+
+            <div class="flip-card-front d-flex align-items-center justify-content-center text-center">
+              <h5 class="fw-semibold fs-4 text-dark">Harga Terjangkau</h5>
+            </div>
+
+            <div class="flip-card-back d-flex align-items-center justify-content-center text-center p-3">
+              <p class="mb-0">
+                Harga kompetitif dengan kualitas benih terjamin.
+              </p>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+      <!-- Card 3 -->
+      <div class="col-12 col-sm-6 col-lg-3">
+        <div class="flip-card h-100">
+          <div class="flip-card-inner">
+
+            <div class="flip-card-front d-flex align-items-center justify-content-center text-center">
+              <h5 class="fw-semibold fs-4 text-dark">Pengiriman Aman</h5>
+            </div>
+
+            <div class="flip-card-back d-flex align-items-center justify-content-center text-center p-3">
+              <p class="mb-0">
+                Pengiriman aman melalui jalur resmi ke seluruh Indonesia.
+              </p>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+      <!-- Card 4 -->
+      <div class="col-12 col-sm-6 col-lg-3">
+        <div class="flip-card h-100">
+          <div class="flip-card-inner">
+
+            <div class="flip-card-front d-flex align-items-center justify-content-center text-center">
+              <h5 class="fw-semibold fs-4 text-dark">Legal & Resmi</h5>
+            </div>
+
+            <div class="flip-card-back d-flex align-items-center justify-content-center text-center p-3">
+              <p class="mb-0">
+                Benih bersertifikat dan sesuai regulasi pemerintah.
+              </p>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <section class="bg-white py-5">
+  <div class="container">
+
+    <div class="text-center mb-4">
+      <h2 class="fw-bold">Kegiatan & Edukasi Lapangan</h2>
+      <p class="text-muted">
+        Komitmen kami dalam mendampingi pekebun secara langsung
+      </p>
+    </div>
+
+    <div class="row g-4">
+
+      <!-- Event Card -->
+      <div class="col-md-4">
+        <div class="card h-100 shadow-sm border-0">
+          <img src="/events/workshop.jpg" class="card-img-top" alt="Event">
+
+          <div class="card-body">
+            <span class="badge bg-success mb-2">Workshop</span>
+
+            <h6 class="fw-bold">
+              Pelatihan Pemilihan Benih Sawit Unggul
+            </h6>
+
+            <p class="text-muted small mb-2">
+              Kampar, Riau • 12 Mei 2025
+            </p>
+
+            <p class="small">
+              Edukasi langsung kepada pekebun terkait benih DxP Dami Mas.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Event Card -->
+      <div class="col-md-4">
+        <div class="card h-100 shadow-sm border-0">
+          <img src="/events/pameran.jpg" class="card-img-top" alt="Event">
+
+          <div class="card-body">
+            <span class="badge bg-primary mb-2">Pameran</span>
+
+            <h6 class="fw-bold">
+              Pameran Perkebunan Nasional
+            </h6>
+
+            <p class="text-muted small mb-2">
+              Medan • 20 Juni 2025
+            </p>
+
+            <p class="small">
+              Partisipasi resmi dalam pameran industri perkebunan.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Event Card -->
+      <div class="col-md-4">
+        <div class="card h-100 shadow-sm border-0">
+          <img src="/events/field.jpg" class="card-img-top" alt="Event">
+
+          <div class="card-body">
+            <span class="badge bg-warning mb-2 text-dark">Field Visit</span>
+
+            <h6 class="fw-bold">
+              Kunjungan Kebun Mitra
+            </h6>
+
+            <p class="text-muted small mb-2">
+              Kalimantan Barat • 3 Juli 2025
+            </p>
+
+            <p class="small">
+              Monitoring pertumbuhan dan pendampingan teknis.
+            </p>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="text-center mt-4">
+      <a href="/events" class="btn btn-outline-danger">
+        Lihat Semua Kegiatan
+      </a>
+    </div>
+
+  </div>
+</section>
+
+<section class="bg-light py-5">
+
+  <!-- Section Title -->
+<h1 class="text-center fw-extrabold display-6 display-md-5 display-lg-4 mt-5 mb-4">
+    Artikel Terbaru dari Blog Kami
+</h1>
+  <div class="container my-5">
+  <div class="row justify-content-center">
+    <div class="col-md-8 col-lg-6">
+
+      <div class="card shadow-sm border-0 h-100">
+        <img
+          src="{{ asset('blog/cover.jpg') }}"
+          class="card-img-top"
+          alt="Recent blog post">
+
+        <div class="card-body">
+          <span class="badge bg-success mb-2">Blog Terbaru</span>
+
+          <h5 class="card-title fw-bold mt-2">
+            Cara Memilih Benih Sawit Berkualitas untuk Hasil Maksimal
+          </h5>
+
+          <p class="card-text text-muted">
+            Panduan singkat bagi pekebun sawit dalam memilih benih unggul
+            agar panen lebih cepat dan produktif.
+          </p>
+
+          <a href="/blog/cara-memilih-benih-sawit"
+             class="btn btn-outline-danger">
+            Baca Selengkapnya →
+          </a>
+        </div>
+
+        <div class="card-footer bg-white border-0 text-muted small">
+          Diposting 3 hari yang lalu
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+
+</section>
+
+<h1 class="text-center fw-extrabold display-6 display-md-5 display-lg-4 mt-5 mb-4">
+    Dipercaya dari berbagai perusahaan sawit di Indonesia dan Dunia
+</h1>
+
+  <div class="w-100 bg-white py-4 marquee-container mt-4 overflow-hidden">
+  <div class="marquee-track d-flex">
+    
+    <!-- Group 1 -->
+    <div class="d-flex gap-4 px-4 marquee-group">
+      <div class="badge-item">PT Agro Sejahtera</div>
+      <div class="badge-item">CV Tani Jaya</div>
+      <div class="badge-item">UD Sawit Makmur</div>
+      <div class="badge-item">KSU Karya Bersama</div>
+      <div class="badge-item">PT Nusantara Palm</div>
+      <div class="badge-item">CV Bumi Hijau</div>
+    </div>
+
+    <!-- Group 2 (duplicate) -->
+    <div class="d-flex gap-4 px-4 marquee-group">
+      <div class="badge-item">PT Agro Sejahtera</div>
+      <div class="badge-item">CV Tani Jaya</div>
+      <div class="badge-item">UD Sawit Makmur</div>
+      <div class="badge-item">KSU Karya Bersama</div>
+      <div class="badge-item">PT Nusantara Palm</div>
+      <div class="badge-item">CV Bumi Hijau</div>
+    </div>
+
+  </div>
+</div>
 </main>
 @include('footer')
 

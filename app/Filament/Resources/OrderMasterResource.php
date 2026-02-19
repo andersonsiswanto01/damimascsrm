@@ -29,7 +29,8 @@ use Filament\Forms\Components\FileUpload;
 use App\Models\Order;
 use Filament\Tables\Actions;
 use Filament\Tables\Actions\ActionGroup;
-
+use Filament\Forms\Components\Toggle;
+use Filament\Forms\Components\Hidden;
 
 class OrderMasterResource extends Resource
 {
@@ -38,7 +39,6 @@ class OrderMasterResource extends Resource
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
 
     protected static ?string $navigationGroup = 'Sales';
-    
 
     public static function form(Form $form): Form
     {
@@ -59,9 +59,17 @@ class OrderMasterResource extends Resource
                         'province_id',
                         'regency_id',
                         'district_id',
+                        'status',
                         'village_id'
                     )
                 )
+                ->afterStateUpdated(function ($state, callable $set) {
+                        if ($state) {
+                            
+                            $customer = \App\Models\Customer::find($state);
+                            $set('customer_status', $customer?->status); // put status into hidden field
+                        }
+                    })
 
                 ->createOptionForm([
                     Forms\Components\Tabs::make('Customer Details')
@@ -288,77 +296,22 @@ class OrderMasterResource extends Resource
                             
                                     
                             ]),
-        
-                            Forms\Components\Tabs\Tab::make('SP2BKS Info')
-                            ->schema([
-                                Repeater::make('corporateSp2bks')
-                                ->relationship('corporateSp2bks') // name of the relationship method
-                                ->label('SP2BKS Files')
-                                ->schema([
-                                    TextInput::make('id')
-                                        ->label('SP2BKS ID'),
-    
-                                    FileUpload::make('sp2bks_file')
-                                        ->label('SP2BKS File(s)')
-                                        ->multiple()
-                                        ->downloadable()
-                                        ->disk('local')
-                                        ->openable()
-                                        ->directory('private/documents')
-                                        ->visibility('private')
-                                        ->fetchFileInformation(false)
-                                        ->directory('corporate_sp2bks')
-                                        ->preserveFilenames()
-                                        ->nullable(),
-    
-                                    DatePicker::make('expiry_date')
-                                        ->label('Expiry Date'),
-    
-                                    Repeater::make('sp2bksProducts')
-                                        ->label('Products in SP2BKS')
-                                        ->relationship('sp2bksProducts') // nested relationship
-                                        ->schema([
-                                            Select::make('produsenbenihproduct_id')
-                                                ->label('Product')
-                                                ->relationship('produsenBenihProduct', 'product_name')
-                                                ->searchable()
-                                                ->preload()
-                                                ->createOptionForm([
-                                                    TextInput::make('product_name')->required(),
-                                                    Select::make('produsen_benih_id')
-                                                        ->label('Producer')
-                                                        ->relationship('produsen', 'name') // Assuming your product belongsTo producer
-                                                        ->searchable()
-                                                        ->preload()
-                                                        ->createOptionForm([
-                                                            TextInput::make('name')->required(),
-                                                        ])
-                                                ]) ,
-                            
-                                            TextInput::make('quantity')
-                                                ->label('Quantity')
-                                                ->numeric()
-                                                ->required(),
-                                        ])
-                                        ->collapsible()
-                                        ->defaultItems(1)
-                                        ->columns(2),
-    
-                                ])
-                                ->columns(1)
-                                ->collapsible(),
-                            ])
-                            ->hidden(fn ($get) => !in_array($get('status'), ['corporate', 'breeder','distributor'])), // ✅ Hide if private
                     ]),
                 ])
-                    ->getOptionLabelFromRecordUsing(fn ($record) => "{$record->customer_name} ({$record->telephone_number})")
+                    ->getOptionLabelFromRecordUsing(fn ($record) => "{$record->customer_name} ({$record->telephone_number}) ({$record->status})")
                     ->searchable(['customer_name', 'telephone_number'])
                     ->label('Customer')
+                    ->reactive()
                     ->required(),
 
-                DatePicker::make('payment_date')
-                    ->label('Tanggal Pembayaran')
-                    ->nullable(),
+                Forms\Components\Hidden::make('customer_status')
+                    ->default(fn ($record) => $record?->customer?->status ?? null)
+                    ->dehydrated(false) // don’t save it to DB
+                    ->reactive(),
+
+                // DatePicker::make('payment_date')
+                //     ->label('Tanggal Pembayaran')
+                //     ->nullable(),
 
                 Select::make('order_source')
                     ->label('Order Source')
@@ -380,20 +333,67 @@ class OrderMasterResource extends Resource
                     ->placeholder('Enter PO number')
                     ->visible(fn (callable $get) => $get('order_source') === 'po'), // Visible only if order_source is 'po'
 
-                FileUpload::make('payment_picture')
-                    ->image()
-                    ->imageEditor()
-                    ->downloadable()
-                    ->multiple()
-                    ->fetchFileInformation(false)
-                    ->label('Payment Picture')
-                    ->directory('private/documents') // Store in storage/app/private/documents
-                    ->visibility('private') // Make it private
-                    ->disk('local') // Use the local disk
-                    ->acceptedFileTypes(['image/jpeg', 'image/png', 'application/pdf'])
-                    ->maxSize(2048)
-                    ->columnSpanFull()
-                    ->openable(),
+                Toggle::make('add_payment')
+                    ->label('Add Payment')
+                    ->default(function ($livewire){
+                    $record = $livewire->record;
+                    // Return true if record has payments
+                    return $record?->payments()->exists() ?? false;
+                    })
+                    ->reactive(),
+
+               Repeater::make('payments')
+                    ->relationship('payments') // assumes OrderMaster hasMany OrderPayment
+                    ->schema([
+                        TextInput::make('amount')
+                            ->numeric()
+                            ->prefix('Rp'),
+
+                     TextInput::make('stage_name')
+                        ->label('Stage')
+                            ->afterStateHydrated(function ($set, $state, $record) {
+                                $set('stage_name', $record?->stage?->name);
+                            })
+                        ->disabled()
+                        ->dehydrated(false), // don’t try to save back to DB
+
+                        FileUpload::make('payment_proof')
+                            ->label('Proof')
+                            ->image()
+                            ->imageEditor()
+                            ->directory('private/documents/payments') // Store in storage/app/private/documents/payments
+                            ->visibility('private') // Make it private
+                            ->disk('local') // Use the local disk
+                            ->acceptedFileTypes(['image/jpeg', 'image/png', 'application/pdf'])
+                            ->maxSize(2048)
+                            ->downloadable()
+                            ->previewable(),
+
+                        Select::make('payment_type_id')
+                            ->label('Payment Type')
+                            ->relationship('paymentType', 'name'), // assumes relation in OrderPayment,
+                    ])
+                    ->minItems(0)
+                    ->columns(2)
+                    ->addActionLabel('Add Payment')
+                    ->hidden(fn (callable $get) => !$get('add_payment'))
+                    ,
+
+                    // Depricated functionality
+                // FileUpload::make('payment_picture')
+                //     ->image()
+                //     ->imageEditor()
+                //     ->downloadable()
+                //     ->multiple()
+                //     ->fetchFileInformation(false)
+                //     ->label('Payment Picture')
+                //     ->directory('private/documents') // Store in storage/app/private/documents
+                //     ->visibility('private') // Make it private
+                //     ->disk('local') // Use the local disk
+                //     ->acceptedFileTypes(['image/jpeg', 'image/png', 'application/pdf'])
+                //     ->maxSize(2048)
+                //     ->columnSpanFull()
+                //     ->openable(),
 
             
                     // Grid::make(2)->schema([
@@ -460,9 +460,27 @@ class OrderMasterResource extends Resource
             ])
             ->columnSpan(2) ,
             Repeater::make('MasterOrder')
-                ->label('List of Orders')
+                ->label('Orders')
                 ->columnSpan(2) // 👈 This makes it span 2 columns in a grid layout
                 ->relationship('orders') // assuming hasMany('orders')
+                ->disableItemCreation(function ($get, $livewire) {
+                        $orderMaster = $livewire->record; // This is your OrderMaster model
+
+                        if (! $orderMaster) {
+                            // On "create" page, there’s no record yet
+                            return false;
+                        }
+
+                        // Access the related customer
+                        $customer = $orderMaster->customer;
+
+                        // Check status
+                        if ($customer && $customer->status !== 'private') {
+                            return true; // disable item creation
+                        }
+
+                        return false; // allow creation
+                    })
                 ->schema([
                 
                 Section::make('Customer Details')
@@ -661,7 +679,11 @@ class OrderMasterResource extends Resource
                 
     
                 Forms\Components\Section::make('Required Documents')
-                    ->schema([
+                ->hidden(function ($get, $livewire) {
+                    return $get('../../customer_status') !== 'private'
+                        && ($livewire->record?->customer?->status) !== 'private';
+                })
+                ->schema([
                         Forms\Components\Grid::make(2) // 💡 Two-column layout inside the section
                             ->schema([
                                 FileUpload::make('landcertificate_photo')
@@ -752,7 +774,8 @@ class OrderMasterResource extends Resource
                     ]),
             
                 ]),
-        ]);
+
+                                                        ]);
     }
 
     public static function table(Table $table): Table
@@ -777,14 +800,52 @@ class OrderMasterResource extends Resource
             TextColumn::make('orders_count')
                 ->label('Customer Count')
                 ->counts('orders'),
-            TextColumn::make('payment_date')
-                ->label('Date of Payment'),
+           TextColumn::make('latest_payment_date')
+                ->label('Date of Payment')
+                        ->getStateUsing(function ($record) {
+                        $latestPayment = $record->payments()->latest('created_at')->first();
+                        return $latestPayment?->created_at?->format('d M Y');
+                    })
+                ->sortable(query: function ($query, string $direction): void {
+                    $query->orderByRaw(
+                        '(SELECT MAX(created_at) FROM order_payments WHERE order_payments.order_master_id = order_masters.id) ' . $direction
+                    );
+                }),
             
-            TextColumn::make('payment_verified')
-                ->label('Payment Status')
-                ->badge()
-                ->formatStateUsing(fn (bool $state): string => $state ? 'verified' : 'not_verified')
-                ->color(fn (bool $state): string => $state ? 'success' : 'gray'),
+                TextColumn::make('payment_status')
+                    ->label('Payment Status')
+                    ->getStateUsing(function ($record) {
+                        // 1. Calculate total order amount
+                        $orderTotal = $record->orders
+                            ->flatMap(fn ($order) => $order->orderProducts) // all products
+                            ->sum(fn ($product) => $product->qty * $product->product_price);
+
+                        // 2. Calculate total payments
+                        $paymentTotal = $record->payments
+                        ->where('order_payment_stage_id', 2)
+                        ->sum('amount');
+
+                        // 3. Determine status
+                        if ($paymentTotal === 0) {
+                            return 'No Payments';
+                        }
+
+                        if ($paymentTotal > $orderTotal) {
+                            return 'Over Paid';
+                        }
+
+                        if ($paymentTotal == $orderTotal) {
+                            return 'Paid';
+                        }
+
+                        if ($paymentTotal < $orderTotal) {
+                            return 'Partially Paid';
+                        }
+
+                        return '-'; // fallback
+                    })
+                    ,
+
 
                 TextColumn::make('total_purchase')
                 ->label('Total Purchase')
@@ -793,26 +854,80 @@ class OrderMasterResource extends Resource
             
         ])
         ->defaultSort('order_date', 'desc')
+        ->filters([
+    Tables\Filters\SelectFilter::make('payment_status')
+        ->label('Payment Status')
+        ->options([
+            'no'        => 'No Payments',
+            'partial'   => 'Partially Paid',
+            'paid'      => 'Paid',
+            'over'      => 'Over Paid',
+        ])
+        ->query(function ($query, array $data) {
+                $value = $data['value'] ?? null;
+
+                if ($value === 'no') {
+                    return $query->whereDoesntHave('payments');
+                }
+
+                if ($value === 'partial') {
+                    return $query->whereRaw('
+                        (SELECT COALESCE(SUM(amount),0) FROM order_payments WHERE order_payments.order_master_id = order_masters.id)
+                        <
+                        (SELECT COALESCE(SUM(qty * product_price),0)
+                        FROM orders 
+                        JOIN order_products ON orders.id = order_products.order_id
+                        WHERE orders.order_master_id = order_masters.id)
+                    ');
+                }
+
+                if ($value === 'paid') {
+                    return $query->whereRaw('
+                        (SELECT COALESCE(SUM(amount),0) FROM order_payments WHERE order_payments.order_master_id = order_masters.id)
+                        =
+                        (SELECT COALESCE(SUM(qty * product_price),0)
+                        FROM orders 
+                        JOIN order_products ON orders.id = order_products.order_id
+                        WHERE orders.order_master_id = order_masters.id)
+                    ');
+                }
+
+                if ($value === 'over') {
+                    return $query->whereRaw('
+                        (SELECT COALESCE(SUM(amount),0) FROM order_payments WHERE order_payments.order_master_id = order_masters.id)
+                        >
+                        (SELECT COALESCE(SUM(qty * product_price),0)
+                        FROM orders 
+                        JOIN order_products ON orders.id = order_products.order_id
+                        WHERE orders.order_master_id = order_masters.id)
+                    ');
+                }
+
+                return $query;
+            }),
+            ])
+
         
         ->actions([
             ActionGroup::make([
                 Actions\EditAction::make(),
                 Actions\DeleteAction::make(),
+                
                 Actions\Action::make('Generate PI PDF')
                     ->url(fn (OrderMaster $record): string => route('order.pi.pdf', $record->id))
                     ->icon('heroicon-o-pencil')
                     ->color('success')
                     ->requiresConfirmation()
-                    ->label('PI')
-                    ->visible(fn (OrderMaster $record): bool => $record->all_orders_have_stage_greater_than_two),
+                    ->label('PI'),
+                    // ->visible(fn (OrderMaster $record): bool => $record->all_orders_have_stage_greater_than_two),
         
                 Actions\Action::make('Generate SD PDF')
                     ->url(fn (OrderMaster $record): string => route('order.sd.pdf', $record->id))
                     ->icon('heroicon-o-pencil')
                     ->color('success')
                     ->requiresConfirmation()
-                    ->label('SD')
-                    ->visible(fn (OrderMaster $record): bool => $record->all_orders_have_stage_greater_than_two),
+                    ->label('SD'),
+                    // ->visible(fn (OrderMaster $record): bool => $record->all_orders_have_stage_greater_than_two),
 
             ])->iconButton(), // Make sure the iconButton is placed correctly here
         ])
@@ -821,12 +936,12 @@ class OrderMasterResource extends Resource
         ]);
     }
 
-    public static function getRelations(): array
-    {
-        return [
-            //
-        ];
-    }
+   public static function getRelations(): array
+{
+    return [
+        RelationManagers\CorporateSp2bksRelationManager::class,
+    ];
+}
 
     public static function getPages(): array
     {

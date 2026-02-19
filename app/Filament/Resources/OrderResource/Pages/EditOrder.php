@@ -8,64 +8,39 @@ use Filament\Resources\Pages\EditRecord;
 use App\Models\Customer;
 use Filament\Pages\Actions\Action;
 use Filament\Notifications\Notification;
+use Illuminate\Database\Eloquent\Model;
 
 
 class EditOrder extends EditRecord
 {
     protected static string $resource = OrderResource::class;
 
+    protected function resolveRecord($key): Model
+{
+    return static::getModel()::with([
+        'orderMaster.customer', // 👈 preload the customer relationship
+        // 'customer.address', // you can even chain deeper
+        // 'products', // preload other relationships too
+    ])->findOrFail($key);
+}
+
     protected function getHeaderActions(): array
     {
-        // If stage > 1, return an empty array = no header actions allowed
-        if ($this->record->order_stage_id > 1) {
-            return [];
-        }
-    
+
         return [
             Actions\DeleteAction::make(),
-            Action::make('Verify Documents')
-                ->color('success')
-                ->icon('heroicon-o-check-circle')
-                ->requiresConfirmation()
-                ->label('Verify Documents')
-                ->action(function () {
-                    $order = $this->record;
-                    $customer = \App\Models\Customer::find($order->customer_id);
-    
-                    if ($order->order_stage_id > 1) {
-                        Notification::make()
-                            ->title('Order is already in process or completed.')
-                            ->danger()
-                            ->send();
-    
-                        return;
-                    }
-  
-                    $ktpPhoto = $order?->KTP_photo;
-                    $landCert = $order->landcertificate_photo;
-                    $statementLetter = $order->statementletter_photo;
-                    $kartukeluarga = $order->kartu_keluarga;
-    
-                    if (
-                        $order->order_stage_id == 1 &&
-                        $landCert &&
-                        $statementLetter &&
-                        $ktpPhoto &&
-                        $kartukeluarga
-                    ) {
-                        $order->incrementOrderStage('All documents are present, applying for verification');
-    
-                        Notification::make()
-                            ->title('Order moved to next stage!')
-                            ->success()
-                            ->send();
-                    } else {
-                        Notification::make()
-                            ->title('Not all documents are complete.')
-                            ->warning()
-                            ->send();
-                    }
-                }),
+             Action::make('Verify Documents')
+            ->color('success')
+            ->icon('heroicon-o-check-circle')
+            ->requiresConfirmation()
+            ->label('Verify Documents')
+            ->action(function () {
+                // your logic here
+            })
+            ->visible(fn (): bool =>
+                $this->record->orderDocumentStage->code === 'waiting_docs'
+                || $this->record->orderDocumentStage->code === 'document_revision'
+            ),
         ];
     }
     
@@ -104,28 +79,22 @@ class EditOrder extends EditRecord
     }
 
     protected function getFormActions(): array
-    {
-        // If stage is 3, return the custom action
-        if ($this->record->order_stage_id == 3) {
-            return [
-                Action::make('submitPaymentSection')
-                    ->label('Submit Payment Details')
-                    ->icon('heroicon-o-paper-airplane')
-                    ->color('primary')
-                    ->action('submitPaymentSection'),
-            ];
-        }
+{
+    $this->record->loadMissing('orderDocumentStage');
 
-        // If stage is greater than 1, return no actions
-        if ($this->record->order_stage_id > 1) {
-            return [];
-        }
-        // Return actions including your custom action
+    if ($this->record->orderDocumentStage?->editable) {
+        // editable = 1 → allow edit
         return [
             $this->getSaveFormAction(),
             Actions\DeleteAction::make(),
         ];
     }
+
+    // editable = 0 → lock
+    return [
+       
+    ];
+}
     
 
 //     protected function mutateFormDataBeforeSave(array $data): array
@@ -149,9 +118,7 @@ class EditOrder extends EditRecord
 //         $order->incrementOrderStage('All documents are present, applying for verification');
 //     }
 
-//     return $data;
-// }
+}
 
 
     
-}

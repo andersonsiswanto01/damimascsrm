@@ -15,6 +15,7 @@ use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Filament\Tables\Actions\Action;
 use Filament\Tables\Columns\TextColumn;
 use App\Models\Order;
+use App\Models\OrderMaster;
 use App\Models\OrderStage;
 use App\Models\User;
 use Filament\Forms\Components\FileUpload;
@@ -26,6 +27,8 @@ use Filament\Forms\Components\Repeater;
 use App\Models\Product;
 use Filament\Forms\Components\Select;
 use Filament\Tables\Actions\ActionGroup;
+use App\Models\OrderPayment;
+use App\Models\OrderProduct;
 
 class DeliveryOrderResource extends Resource
 {
@@ -38,7 +41,6 @@ class DeliveryOrderResource extends Resource
         ->columns([
             TextColumn::make('id')->label('Order ID')->sortable(),
             TextColumn::make('orderMaster.customer.customer_name')->label('Customer Name'),
-            TextColumn::make('stage.code')->label('Current Status'),
             TextColumn::make('orderMaster.user_id')->label('Sales Person')
                 ->getStateUsing(function (Order $record) {
                     return User::find($record->orderMaster->user_id)->name;
@@ -205,8 +207,28 @@ class DeliveryOrderResource extends Resource
 
     public static function getEloquentQuery(): Builder
     {
-        return Order::query()
-            ->whereHas('stage', fn ($q) => $q->where('code', 'ready_to_deliver'));
+         return Order::query()
+        // ✅ filter by document verification
+        ->whereHas('orderDocumentStage', fn ($q) =>
+            $q->where('code', 'docs_verified')
+        )
+
+        ->addSelect([
+            'total_product_value' => OrderProduct::selectRaw('SUM(product_price * qty)')
+                ->whereColumn('order_id', 'orders.id')
+        ])
+
+        ->addSelect([
+            'total_payment_value' => OrderPayment::selectRaw('SUM(amount)')
+                ->whereColumn('order_master_id', 'orders.order_master_id')
+                ->where('order_payment_stage_id', '2')
+        ])
+
+        
+        // ✅ only include orders fully paid
+        ->havingRaw('total_payment_value >= total_product_value');
+
+
     }
     
     public static function getModel(): string

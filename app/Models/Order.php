@@ -134,53 +134,76 @@ class Order extends Model
     }
 
     public function order_stage_histories()
-{
-    return $this->hasMany(OrderStatusHistory::class);
-}
-
-public function orderMaster()
-{
-    return $this->belongsTo(OrderMaster::class, 'order_master_id');
-}
-
-
-public function incrementOrderStage(?string $notes = null): void
-{
-    $maxStageId = OrderStage::max('id');
-
-    if ($this->order_stage_id >= $maxStageId) {
-        throw new \InvalidArgumentException("Order is already at the final stage.");
+    {
+        return $this->hasMany(OrderStatusHistory::class);
     }
 
-    $this->order_stage_id++;
-    $this->save();
-
-    $this->order_stage_histories()->create([
-        'order_id' => $this->id,
-        'order_stage_id' => $this->order_stage_id,
-        'note' => $notes,
-        'changed_by' => Auth::id(),
-    ]);
-}
-    
-public function decrementOrderStage(?string $notes = null): void
-{
-    $minStageId = OrderStage::min('id');
-
-    if ($this->order_stage_id <= $minStageId) {
-        throw new \InvalidArgumentException("Order is already at the initial stage.");
+    public function orderMaster()
+    {
+        return $this->belongsTo(OrderMaster::class, 'order_master_id');
     }
 
-    $this->order_stage_id--;
-    $this->save();
+    public function orderDocumentStage()
+    {
+        return $this->belongsTo(OrderDocumentStage::class, 'order_document_stage_id');
+    }
 
-    $this->order_stage_histories()->create([
-        'order_id' => $this->id,
-        'order_stage_id' => $this->order_stage_id,
-        'note' => $notes,
-        'changed_by' => Auth::id(),
-    ]);
-}
+    public function incrementOrderStage(?string $notes = null): void
+    {
+        $maxStageId = OrderDocumentStage::max('id');
+
+        if ($this->order_document_stage_id >= $maxStageId) {
+            throw new \InvalidArgumentException("Order already cancelled");
+        }
+
+        // If documents are in revision, reset to initial stage instead of incrementing
+        if ($this->order_document_stage_id == 7) {
+            $this->order_document_stage_id = 1;
+        }
+
+        $this->order_document_stage_id++;
+        $this->order_stage_histories()->create([
+            'order_id' => $this->id,
+            'order_stage_id' => $this->order_stage_id,
+            'note' => $notes,
+            'changed_by' => Auth::id(),
+        ]);
+        $this->save();
+    }
+               
+    public function decrementOrderStage(?string $notes = null): void
+    {
+        $minStageId = OrderDocumentStage::min('id');
+
+        if ($this->order_stage_id <= $minStageId) {
+            throw new \InvalidArgumentException("Order is already at the initial stage.");
+        }
+
+        $this->order_document_stage_id--;
+        $this->save();
+
+        $this->order_stage_histories()->create([
+            'order_id' => $this->id,
+            'order_stage_id' => $this->order_stage_id,
+            'note' => $notes,
+            'changed_by' => Auth::id(),
+        ]);
+    }
+
+    public function revisionDocument(?string $notes = null): void
+    {
+        $this->order_document_stage_id = 7; // Go to Document Revision
+        $this->save();
+
+        $this->order_stage_histories()->create([
+            'order_id' => $this->id,
+            'order_stage_id' => $this->order_stage_id,
+            'order_document_stage_id' => $this->order_document_stage_id,
+            'note' => $notes,
+            'changed_by' => Auth::id(),
+        ]);
+    }   
+
 
 
     

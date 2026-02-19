@@ -4,9 +4,12 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class CorporateSp2bks extends Model
+class CorporateSp2bk extends Model
 
 {
+
+    protected $table = 'corporate_sp2bks';
+    
     protected $fillable = ['customer_id', 'sp2bks_file', 'expiry_date'];
     protected $casts = [
         'id' => 'string',

@@ -11,6 +11,7 @@ class OrderMaster extends Model
 {
     protected $fillable = [
         'reference_number',
+        'user_id',
         'order_date',
         'customer_id',
         'notes',
@@ -47,11 +48,28 @@ class OrderMaster extends Model
     {
         return $this->belongsTo(Customer::class, 'customer_id');
     }
-    
+
     public function user()
     {
         return $this->belongsTo(User::class);
     }
+
+    public function corporateSp2bk()
+{
+    return $this->hasManyThrough(
+        \App\Models\corporateSp2bk::class,   // child model
+        \App\Models\Customer::class,         // intermediate model
+        'id',                                // foreign key on Customer (local key)
+        'customer_id',                       // foreign key on CorporateSp2bk
+        'customer_id',                       // local key on OrderMaster
+        'id'                                 // local key on Customer
+    );
+}
+
+     public function payments()
+    {
+        return $this->hasMany(OrderPayment::class);
+    } 
 
     public function gettotalPurchaseAttribute()
     {
@@ -88,7 +106,6 @@ public function incrementOrderStage(): void
 
 public function getInvoiceStatementAttribute()
 {
-
     return match ($this->order_source) {
       'whatsapp' => 'diskusi melalui WhatsApp dengan',
         'meeting' => ' pertemuan langsung dengan',
@@ -99,6 +116,9 @@ public function getInvoiceStatementAttribute()
         default => ' kesepakatan sebelumnya dengan',
     };
 }
+
+
+
 
    
 

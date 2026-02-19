@@ -22,13 +22,22 @@ use Filament\Tables\Actions\ActionGroup;
 use Filament\Pages\Actions\Action;
 use Filament\Notifications\Notification;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Database\Eloquent\Builder;
 
 class OrderResource extends Resource
 {
     protected static ?string $model = Order::class;
+
     protected static ?string $navigationIcon = 'heroicon-o-shopping-cart';
     protected static ?string $navigationGroup = 'Sales';
-   
+
+    public static function getEloquentQuery(): Builder
+    {
+        return parent::getEloquentQuery()
+            ->with('orderMaster.payments');
+    }
+
+
     public static function form(Form $form): Form
     {
         return $form
@@ -108,6 +117,8 @@ class OrderResource extends Resource
                             ]),
                     ]),
 
+
+                    
                     Forms\Components\Section::make('Product and Delivery Details')
                     ->schema([
 
@@ -214,37 +225,41 @@ class OrderResource extends Resource
                     ]),
                 
 
-                Forms\Components\Section::make('Payment Details')
-                    ->schema([
+                // Forms\Components\Section::make('Payment Details')
+                //     ->schema([
 
-                        Forms\Components\Grid::make(2) // 💡 Two-column layout inside the section
-                        ->schema([
-                            FileUpload::make('payment_photo')
-                                ->image()
-                                ->imageEditor()
-                                ->downloadable()
-                                ->disk('local')
-                                ->acceptedFileTypes(['image/jpeg', 'image/png', 'application/pdf'])
-                                ->maxSize(2048)
-                                ->directory('private/documents')
-                                ->visibility('private')
-                                ->openable()
-                                ->fetchFileInformation(false)
-                                ->acceptedFileTypes(['image/*'])
-                                ->label('Payment Proof')
-                                ->nullable(),
+                //         Forms\Components\Grid::make(2) // 💡 Two-column layout inside the section
+                //         ->schema([
+                //             FileUpload::make('payment_photo')
+                //                 ->image()
+                //                 ->imageEditor()
+                //                 ->downloadable()
+                //                 ->disk('local')
+                //                 ->acceptedFileTypes(['image/jpeg', 'image/png', 'application/pdf'])
+                //                 ->maxSize(2048)
+                //                 ->directory('private/documents')
+                //                 ->visibility('private')
+                //                 ->openable()
+                //                 ->fetchFileInformation(false)
+                //                 ->acceptedFileTypes(['image/*'])
+                //                 ->label('Payment Proof')
+                //                 ->nullable(),
 
-                            DatePicker::make('payment_date')
-                                ->label('Payment Date')
-                                ->nullable(),
+                //             DatePicker::make('payment_date')
+                //                 ->label('Payment Date')
+                //                 ->nullable(),
     
-                        ]),
+                //         ]),
 
-                    ]),
+                //     ]),
                 
                 
     
-                Forms\Components\Section::make('Required Documents')
+
+                    Forms\Components\Section::make('Required Documents')
+                        ->hidden(function ($livewire) {
+                           return ($livewire->record?->orderMaster->customer->status) !== 'private';
+                        })
                     ->schema([
                         Forms\Components\Grid::make(2) // 💡 Two-column layout inside the section
                             ->schema([
@@ -362,6 +377,9 @@ class OrderResource extends Resource
                 Tables\Columns\TextColumn::make('id')
                 ->label('Order ID')
                 ->sortable(),
+                Tables\Columns\TextColumn::make('orderMaster.user.name')
+                    ->label('Sales Name')
+                    ->sortable(),
                 Tables\Columns\TextColumn::make('orderMaster.id') // Assuming 'orderMaster' is the relationship method name
                     ->label('Order Master ID')
                     ->sortable(),
@@ -370,7 +388,7 @@ class OrderResource extends Resource
                     ->sortable(),
                 Tables\Columns\TextColumn::make('customer_name')
                     ->label('Order Name'),
-                    
+                
                 Tables\Columns\TextColumn::make('orderProducts.product.name')
                 ->label('Products Ordered')
                 ->badge(),
@@ -378,16 +396,65 @@ class OrderResource extends Resource
                 Tables\Columns\TextColumn::make('orderMaster.customer.status')
                     ->label('Customer Type')
                     ->sortable(),
-                Tables\Columns\TextColumn::make('stage.code')
-                    ->label('Status')
+                // Tables\Columns\TextColumn::make('stage.code')
+                //     ->label('Status')
+                //     ->badge()
+                //     ->color(fn ($record) => $record->stage?->color ?? 'secondary')
+                //     ->sortable(),
+                Tables\Columns\TextColumn::make('orderDocumentStage.code')
+                    ->label('Documents Status')
                     ->badge()
-                    ->color(fn ($record) => $record->stage?->color ?? 'secondary')
+                    ->color(fn ($record) => $record->orderDocumentStage->color ?? 'secondary')
                     ->sortable(),
-                Tables\Columns\TextColumn::make('orderMaster.payment_verified')
+                 Tables\Columns\TextColumn::make('payment_status')
                     ->label('Payment Status')
-                    ->badge()
-                    ->formatStateUsing(fn (bool $state): string => $state ? 'verified' : 'not_verified')
-                    ->color(fn (bool $state): string => $state ? 'success' : 'gray'),
+                    ->getStateUsing(function ($record) {
+
+                        // 1. Get the parent OrderMaster
+                        $orderMaster = $record->orderMaster; // assumes your relationship is named 'orderMaster'
+
+                        if (!$orderMaster) {
+                            return '-';
+                        }
+
+                        // 2. Calculate total order amount from all orders of this OrderMaster
+                        $orderTotal = $orderMaster->orders
+                            ->flatMap(fn ($order) => $order->orderProducts) // all products
+                            ->sum(fn ($product) => $product->qty * $product->product_price);
+
+                        // 3. Calculate total verified payments
+                        $paymentTotal = $orderMaster->payments
+                            ->where('order_payment_stage_id', 2)
+                            ->sum('amount');
+
+                        // 4. Determine status
+                        if ($paymentTotal === 0) {
+                            return 'No Payments';
+                        }
+
+                        if ($paymentTotal > $orderTotal) {
+                            return 'Over Paid';
+                        }
+
+                        if ($paymentTotal == $orderTotal) {
+                            return 'Paid';
+                        }
+
+                        if ($paymentTotal < $orderTotal) {
+                            return 'Partially Paid';
+                        }
+
+                        return '-'; // fallback
+                    })
+                      ->badge()
+                    ->color(fn (string $state): string => match ($state) {
+                        'Paid' => 'success',
+                        'Partially Paid' => 'warning',
+                        'Over Paid' => 'danger',
+                        'No Payments' => 'warning',
+                        default => 'secondary',
+                    }),
+
 
                 Tables\Columns\TextColumn::make('orderMaster.customer.telephone_number')
                     ->label('Customer Phone')
@@ -412,41 +479,38 @@ class OrderResource extends Resource
                         ->label('Order Status')
                         ->multiple()
                         ->options([
-                            '1' => 'Menunggu Dokument Lengkap',
-                            '2' => 'Sedang Verifikasi Dokumen',
-                            '3' => 'Menunggu Pembayaran',
-                            '4' => 'Sedang Dalam Antrian',
-                            '5' => 'Sedang Verifikasi DisBun',
-                            '6' => 'Menunggu PO',
-                            '7' => 'Siap Dikirim',
-                            '8' => 'Sudah Dikirim',
-                            '9' => 'Perlu Revisi Dokument',
-                            '10' => 'Batal',
+                            '1' => 'Waiting for Document',
+                            '2' => 'Verifying Docs',
+                            '3' => 'Documents Verified',
+                            '4' => 'Verifying DisBun',
+                            '5' => 'Waiting PO',
+                            '6' => 'Complete',
+                            '7' => 'Document Revision',
+                            '8' => 'Canceled',
                         ]),
+                    Tables\Filters\SelectFilter::make('orderMaster.user.name')
+                        ->label('Sales Representative')
+                        ->relationship('orderMaster.user', 'name')
+                        ->multiple(),
                 ])
             
                 ->actions([
                     ActionGroup::make([
                         Actions\EditAction::make(),
-                        Actions\Action::make('accept_document')
+                        Actions\Action::make('document_verification')
                             ->label('Verify Document')
-                            ->color('success')
+                            ->color('warning')
                             ->icon('heroicon-m-check-circle')
                             ->requiresConfirmation()
-                            ->visible(fn (Order $record): bool => $record->order_stage_id == 1)
+                            ->visible(fn (Order $record): bool => 
+                                $record->orderDocumentStage->code === 'waiting_docs' 
+                                || $record->orderDocumentStage->code === 'document_revision'
+                            )
                              ->action(function (Order $record, $action)  {
-                                if ($record->order_stage_id >= 2) {
-                                     Notification::make()
-                                    ->title('Submission Failed')
-                                    ->body('You cannot submit the application at this stage.')
-                                    ->danger()
-                                    ->send();
-                                    return;
-                                }
 
                                 // Continue with valid stage
                                 $record->incrementOrderStage('Applying for document verification');
-
+                                
                                   Notification::make()
                                 ->title('Success')
                                 ->body('Application submitted successfully.')
@@ -454,14 +518,6 @@ class OrderResource extends Resource
                                 ->send();
                             }),
 
-                        Actions\Action::make('Generate PI PDF')
-                            ->url(fn (Order $record): string => route('order.pi.pdf', $record->id))
-                            ->icon('heroicon-o-pencil')
-                            ->color('success')
-                            ->requiresConfirmation()
-                            ->label('PI')
-                            ->visible(fn (Order $record): bool => $record->order_stage_id >= 2),
-                
                     ])->iconButton(), // Make sure the iconButton is placed correctly here
                 ])
                 ->bulkActions([
