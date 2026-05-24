@@ -8,13 +8,16 @@ use App\Livewire\PublicSalesForm;
 use App\Http\Controllers\OrderPdfController;
 use App\Http\Controllers\DocumentController;
 use App\Http\Controllers\DownloadController;
-
+use App\Livewire\CertificateChecker;
 
 // Route::view('/', 'welcome');
 
 Route::get('/', function () {
     return view('app');
 })->name('home');
+
+Route::get('/certificate_checker', CertificateChecker::class)
+    ->name('certificate');
 
 Route::get('about', function () {
     return view('about'); // Assuming your about page Blade file is resources/views/about.blade.php

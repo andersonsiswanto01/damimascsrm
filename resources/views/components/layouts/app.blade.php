@@ -1,29 +1,36 @@
 <!DOCTYPE html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
-    <head>
-        <meta charset="utf-8" />
+<head>
+    <meta charset="utf-8" />
+    <meta name="application-name" content="{{ config('app.name') }}" />
+    <meta name="csrf-token" content="{{ csrf_token() }}" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
 
-        <meta name="application-name" content="{{ config('app.name') }}" />
-        <meta name="csrf-token" content="{{ csrf_token() }}" />
-        <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{{ config('app.name') }}</title>
 
-        <title>{{ config('app.name') }}</title>
+    <style>
+        [x-cloak] {
+            display: none !important;
+        }
+    </style>
 
-        <style>
-            [x-cloak] {
-                display: none !important;
-            }
-        </style>
+    @filamentStyles
+    @vite('resources/css/app.css')
+    @include('header')
+</head>
 
-        @filamentStyles
-        @vite('resources/css/app.css')
-    </head>
+<body class="antialiased min-h-screen flex flex-col">
 
-    <body class="antialiased">
-        
+    {{-- Main content grows to fill remaining space --}}
+    <main class="flex-grow">
         {{ $slot }}
+    </main>
 
-        @filamentScripts
-        @vite('resources/js/app.js')
-    </body>
+    {{-- Footer stays at the bottom --}}
+    @include('footer')
+
+    @filamentScripts
+    @vite('resources/js/app.js')
+
+</body>
 </html>
