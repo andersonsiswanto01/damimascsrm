@@ -2,7 +2,8 @@
 
 namespace App\Filament\Resources\DisBunVerifications\Pages;
 
-use App\Filament\Resources\DisBunVerifications\DisBunVerificationResource;
+use Filament\Actions\DeleteAction;
+use App\Filament\Resources\DisBunVerifications\DisBunVerifications\DisBunVerificationResource;
 use Filament\Actions;
 use Filament\Resources\Pages\EditRecord;
 
@@ -13,7 +14,7 @@ class EditDisBunVerification extends EditRecord
     protected function getHeaderActions(): array
     {
         return [
-            Actions\DeleteAction::make(),
+            DeleteAction::make(),
         ];
     }
 

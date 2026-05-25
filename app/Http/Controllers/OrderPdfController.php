@@ -53,10 +53,10 @@ class OrderPdfController extends Controller
 
 
         $totalPriceTerbilang = ucwords(Terbilang::convert($total));
-        
-        
+
+
         if ($order->customer->status === 'corporate') {
-          
+
         $companyName = $order->customer->company_name;
 
         $legalForm = $order->customer->legal_form;
@@ -69,7 +69,7 @@ class OrderPdfController extends Controller
             'ud' => 'UD ' . $companyName,
              default => $legalForms[$legalForm] . ' ' . $companyName,
         };
-        
+
     };
         // Step 1: Define the path to your private image (e.g., signature image)
         $imagePath = storage_path('app/private/signature/musachandra.png');
@@ -108,7 +108,7 @@ class OrderPdfController extends Controller
         } else {
             abort(404, 'Customer type not supported');
         }
-      
+
 
         return $pdf->stream('PI_' . $order->customer->customer_name . '.pdf');
     }
@@ -119,7 +119,7 @@ class OrderPdfController extends Controller
         $this->authentication($order->order_stage_id);
         $customerName = $order->customer->customer_name;
 
-        
+
         $productDetails = [];
         $orderDetails = [];
         $grandTotal = 0;
@@ -130,12 +130,12 @@ class OrderPdfController extends Controller
         foreach ($order->orders as $singleOrder) {
             $totalQty = 0;
             $totalPrice = 0;
-        
+
             foreach ($singleOrder->orderProducts as $orderProduct) {
                 $subtotal = $orderProduct->qty * $orderProduct->product_price;
                 $totalQty += $orderProduct->qty;
                 $totalPrice += $subtotal;
-        
+
                 // Optionally keep detailed product info per product
                 $productDetails[] = [
                     'order_id' => $singleOrder->id,
@@ -150,17 +150,17 @@ class OrderPdfController extends Controller
                         $singleOrder->created_at->format('Y')
                     ),
                     'delivery_date' => $singleOrder->delivery_date,
-                   
+
                 ];
             }
-        
+
             // Summing up total across all orders
             $grandQty += $totalQty;
             $grandTotal += $totalPrice;
             $grandTotalFormatted =  number_format($grandTotal, 0, ',', '.');
 
             // dd($grandTotalFormatted);
-        
+
             $orderDetails[] = [
                 'order_id' => $singleOrder->id,
                 'paymentdate' => $singleOrder->payment_date,
@@ -205,8 +205,8 @@ class OrderPdfController extends Controller
             'ud' => 'UD ' . $companyName,
             default    => ucfirst($legalForm) . ' ' . $companyName, // fallback with capitalized legal form
         };
-        
-        
+
+
         // Step 1: Define the path to your private image (e.g., signature image)
         $imagePath = storage_path('app/private/signature/musachandra.png');
 
@@ -251,7 +251,7 @@ class OrderPdfController extends Controller
         return $pdf->stream('SD_' . $order->customer->customer_name . '.pdf');
     }
 
-        
+
 
     }
 
@@ -265,7 +265,7 @@ class OrderPdfController extends Controller
 
 
 
-            
+
     //         foreach ($singleOrder->orderProducts as $orderProduct) {
     //             $productDetails[] = [
     //                 'name' => $orderProduct->product->name,
@@ -276,7 +276,7 @@ class OrderPdfController extends Controller
     //         dd($productDetails);
 
     //         $order->load(['customer', 'orderProducts.product']);
-        
+
     //     $this->authentication($order->order_stage_id);
     //     $order->load(['customer', 'orderProducts.product', 'orderMaster.customer']);
     //     $customerName = $order->orderMaster->customer->customer_name;
@@ -308,7 +308,7 @@ class OrderPdfController extends Controller
     //         }),
     //         2, ',', '.'
     //     );
-        
+
     //     $companyName = $order->orderMaster->customer->company_name;
 
     //     $legalForm = $order->orderMaster->customer->legal_form;
@@ -321,8 +321,8 @@ class OrderPdfController extends Controller
     //         'ud' => 'UD ' . $companyName,
     //          default => $legalForms[$legalForm] . ' ' . $companyName,
     //     };
-        
-        
+
+
     //     // Step 1: Define the path to your private image (e.g., signature image)
     //     $imagePath = storage_path('app/private/signature/musachandra.png');
 
@@ -366,7 +366,7 @@ class OrderPdfController extends Controller
     //     return $pdf->stream('SD_' . $order->orderMaster->customer->customer_name . '.pdf');
     // }
 
-        
+
 
     // }
 

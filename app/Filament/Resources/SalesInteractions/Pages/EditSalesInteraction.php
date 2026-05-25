@@ -2,7 +2,8 @@
 
 namespace App\Filament\Resources\SalesInteractions\Pages;
 
-use App\Filament\Resources\SalesInteractions\SalesInteractionResource;
+use Filament\Actions\DeleteAction;
+use App\Filament\Resources\SalesInteractions\SalesInteractions\SalesInteractionResource;
 use Filament\Actions;
 use Filament\Actions\Action;
 use Filament\Resources\Pages\EditRecord;
@@ -15,11 +16,11 @@ class EditSalesInteraction extends EditRecord
     protected function getHeaderActions(): array
 {
     return [
-        Actions\DeleteAction::make(),
+        DeleteAction::make(),
 
         Action::make('updateAuthor')
             ->label('Update Author')
-            ->form([
+            ->schema([
                 Select::make('customer_data')
                     ->label('Author')
                     ->required(),

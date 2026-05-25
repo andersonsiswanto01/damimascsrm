@@ -2,7 +2,8 @@
 
 namespace App\Filament\Resources\Customers\Pages;
 
-use App\Filament\Resources\Customers\CustomerResource;
+use Filament\Actions\EditAction;
+use App\Filament\Resources\Customers\Customers\CustomerResource;
 use Filament\Actions;
 use Filament\Resources\Pages\ViewRecord;
 
@@ -14,7 +15,7 @@ class ViewCustomer extends ViewRecord
     {
         
         return [
-            Actions\EditAction::make(),
+            EditAction::make(),
         ];
     }
 }

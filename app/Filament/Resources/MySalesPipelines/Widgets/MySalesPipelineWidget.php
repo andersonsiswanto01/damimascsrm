@@ -2,6 +2,8 @@
 
 namespace App\Filament\Resources\MySalesPipelines\Widgets;
 
+use Filament\Tables\Columns\TextColumn;
+use Filament\Actions\Action;
 use Filament\Widgets\StatsOverviewWidget as BaseWidget;
 use Filament\Widgets\StatsOverviewWidget\Stat;
 
@@ -24,12 +26,12 @@ class MySalesPipelineWidget extends BaseWidget
         return $table
             ->query(SalesPipeline::where('assigned_to', Auth::id()))
             ->columns([
-                Tables\Columns\TextColumn::make('customer.customer_name')->label('Customer')->sortable(),
-                Tables\Columns\TextColumn::make('status')->sortable(),
-                Tables\Columns\TextColumn::make('deal_value')->label('Expected Value')->money('IDR'),
+                TextColumn::make('customer.customer_name')->label('Customer')->sortable(),
+                TextColumn::make('status')->sortable(),
+                TextColumn::make('deal_value')->label('Expected Value')->money('IDR'),
             ])
-            ->actions([
-                Tables\Actions\Action::make('View Details')
+            ->recordActions([
+                Action::make('View Details')
                     ->url(fn (SalesPipeline $record) => route('filament.resources.sales-pipeline.edit', ['record' => $record->id]))
                     ->icon('heroicon-o-eye')
                     ->button(),

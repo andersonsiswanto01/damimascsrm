@@ -2,7 +2,8 @@
 
 namespace App\Filament\Resources\Districts\Pages;
 
-use App\Filament\Resources\Districts\DistrictResource;
+use Filament\Actions\DeleteAction;
+use App\Filament\Resources\Districts\Districts\DistrictResource;
 use Filament\Actions;
 use Filament\Resources\Pages\EditRecord;
 
@@ -13,7 +14,7 @@ class EditDistrict extends EditRecord
     protected function getHeaderActions(): array
     {
         return [
-            Actions\DeleteAction::make(),
+            DeleteAction::make(),
         ];
     }
 }

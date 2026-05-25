@@ -2,7 +2,8 @@
 
 namespace App\Filament\Resources\Regencies\Pages;
 
-use App\Filament\Resources\Regencies\RegencyResource;
+use Filament\Actions\DeleteAction;
+use App\Filament\Resources\Regencies\Regencies\RegencyResource;
 use Filament\Actions;
 use Filament\Resources\Pages\EditRecord;
 
@@ -13,7 +14,7 @@ class EditRegency extends EditRecord
     protected function getHeaderActions(): array
     {
         return [
-            Actions\DeleteAction::make(),
+            DeleteAction::make(),
         ];
     }
 }

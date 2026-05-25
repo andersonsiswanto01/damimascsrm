@@ -2,7 +2,8 @@
 
 namespace App\Filament\Resources\DisBunVerifications\Pages;
 
-use App\Filament\Resources\DisBunVerifications\DisBunVerificationResource;
+use Filament\Actions\CreateAction;
+use App\Filament\Resources\DisBunVerifications\DisBunVerifications\DisBunVerificationResource;
 use Filament\Actions;
 use Filament\Resources\Pages\ListRecords;
 
@@ -13,7 +14,7 @@ class ListDisBunVerifications extends ListRecords
     protected function getHeaderActions(): array
     {
         return [
-            Actions\CreateAction::make(),
+            CreateAction::make(),
         ];
     }
 }

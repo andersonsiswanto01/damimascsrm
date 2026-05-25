@@ -2,7 +2,7 @@
 
 namespace App\Filament\Resources\Calendars\Pages;
 
-use App\Filament\Resources\Calendars\CalendarResource;
+use App\Filament\Resources\Calendars\Calendars\CalendarResource;
 use Filament\Actions;
 use Filament\Resources\Pages\CreateRecord;
 

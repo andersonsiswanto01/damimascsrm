@@ -2,10 +2,11 @@
 
 namespace App\Filament\Widgets;
 
+use Filament\Tables\Columns\TextColumn;
+use Filament\Actions\Action;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Filament\Widgets\TableWidget as BaseWidget;
-use Filament\Tables\Actions\Action;
 use Illuminate\Database\Eloquent\Builder;
 use App\Models\SalesInteractionFollowup;
 
@@ -21,11 +22,11 @@ class FollowupsWidget extends BaseWidget
     protected function getTableColumns(): array
     {
         return [
-            Tables\Columns\TextColumn::make('followup_date')
+            TextColumn::make('followup_date')
                 ->label('Follow-Up Date')
                 ->sortable(),
 
-            Tables\Columns\TextColumn::make('note')
+            TextColumn::make('note')
                 ->label('Notes')
                 ->limit(50),
 

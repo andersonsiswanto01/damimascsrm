@@ -2,7 +2,8 @@
 
 namespace App\Filament\Resources\Calendars\Pages;
 
-use App\Filament\Resources\Calendars\CalendarResource;
+use Filament\Actions\Action;
+use App\Filament\Resources\Calendars\Calendars\CalendarResource;
 use Filament\Actions;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Textarea;
@@ -30,11 +31,11 @@ class ListCalendars extends ListRecords
     protected function getHeaderActions(): array
     {
         return [
-            Actions\Action::make('newActivity')
+            Action::make('newActivity')
                 ->label('New Activity')
                 ->modalHeading('Create New Activity')
                 ->modalButton('Create')
-                ->form([
+                ->schema([
                     TextInput::make('title')
                         ->label('Activity Title')
                         ->required(),

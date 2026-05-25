@@ -2,7 +2,7 @@
 
 namespace App\Filament\Resources\DisBunVerifications\Pages;
 
-use App\Filament\Resources\DisBunVerifications\DisBunVerificationResource;
+use App\Filament\Resources\DisBunVerifications\DisBunVerifications\DisBunVerificationResource;
 use Filament\Actions;
 use Filament\Resources\Pages\CreateRecord;
 

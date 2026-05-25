@@ -2,7 +2,8 @@
 
 namespace App\Filament\Resources\Provinces\Pages;
 
-use App\Filament\Resources\Provinces\ProvinceResource;
+use Filament\Actions\DeleteAction;
+use App\Filament\Resources\Provinces\Provinces\ProvinceResource;
 use Filament\Actions;
 use Filament\Resources\Pages\EditRecord;
 
@@ -13,7 +14,7 @@ class EditProvince extends EditRecord
     protected function getHeaderActions(): array
     {
         return [
-            Actions\DeleteAction::make(),
+            DeleteAction::make(),
         ];
     }
 }

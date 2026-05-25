@@ -2,11 +2,12 @@
 
 namespace App\Filament\Resources\Orders\Pages;
 
-use App\Filament\Resources\Orders\OrderResource;
+use Filament\Actions\DeleteAction;
+use Filament\Actions\Action;
+use App\Filament\Resources\Orders\Orders\OrderResource;
 use Filament\Actions;
 use Filament\Resources\Pages\EditRecord;
 use App\Models\Customer;
-use Filament\Pages\Actions\Action;
 use Filament\Notifications\Notification;
 use Illuminate\Database\Eloquent\Model;
 
@@ -28,7 +29,7 @@ class EditOrder extends EditRecord
     {
 
         return [
-            Actions\DeleteAction::make(),
+            DeleteAction::make(),
              Action::make('Verify Documents')
             ->color('success')
             ->icon('heroicon-o-check-circle')
@@ -43,34 +44,34 @@ class EditOrder extends EditRecord
             ),
         ];
     }
-    
+
     public function submitPaymentSection()
     {
         // Initialize paymentPhoto as null
         $paymentPhoto = null;
-    
+
         // Check if payment_photo exists and is not empty
         if (isset($this->data['payment_photo']) && !empty($this->data['payment_photo'])) {
             // Access the first file in the array
             $file = reset($this->data['payment_photo']);  // Using reset() to get the first file in the array
-    
+
             // Generate a custom file name or use the original name
             $fileName = uniqid('payment_') . '.' . $file->getClientOriginalExtension();  // You can customize this as needed
-    
+
             // Store the file in 'private/documents' directory
             $paymentPhoto = $file->storeAs('private/documents', $fileName, 'local');  // Save the file with the new name
-    
+
         }
-    
+
         // Get payment_date from the form data
         $paymentDate = $this->data['payment_date'];
-    
+
         // Update the record with the file path and payment date
         $this->record->update([
             'payment_photo' => $paymentPhoto,  // Save the relative file path (e.g., 'private/documents/xxxxx.jpg')
             'payment_date' => $paymentDate,    // Save the date
         ]);
-    
+
         // Send success notification
         Notification::make()
             ->title('Payment details submitted successfully!')
@@ -86,16 +87,16 @@ class EditOrder extends EditRecord
         // editable = 1 → allow edit
         return [
             $this->getSaveFormAction(),
-            Actions\DeleteAction::make(),
+            DeleteAction::make(),
         ];
     }
 
     // editable = 0 → lock
     return [
-       
+
     ];
 }
-    
+
 
 //     protected function mutateFormDataBeforeSave(array $data): array
 // {

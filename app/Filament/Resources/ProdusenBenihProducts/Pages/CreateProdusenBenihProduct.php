@@ -2,7 +2,7 @@
 
 namespace App\Filament\Resources\ProdusenBenihProducts\Pages;
 
-use App\Filament\Resources\ProdusenBenihProducts\ProdusenBenihProductResource;
+use App\Filament\Resources\ProdusenBenihProducts\ProdusenBenihProducts\ProdusenBenihProductResource;
 use Filament\Actions;
 use Filament\Resources\Pages\CreateRecord;
 

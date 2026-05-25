@@ -2,7 +2,7 @@
 
 namespace App\Filament\Resources\SalesInteractions\Pages;
 
-use App\Filament\Resources\SalesInteractions\SalesInteractionResource;
+use App\Filament\Resources\SalesInteractions\SalesInteractions\SalesInteractionResource;
 use Filament\Actions;
 use Filament\Resources\Pages\CreateRecord;
 

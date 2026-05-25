@@ -2,7 +2,8 @@
 
 namespace App\Filament\Resources\Regencies\Pages;
 
-use App\Filament\Resources\Regencies\RegencyResource;
+use Filament\Actions\CreateAction;
+use App\Filament\Resources\Regencies\Regencies\RegencyResource;
 use Filament\Actions;
 use Filament\Resources\Pages\ListRecords;
 
@@ -13,7 +14,7 @@ class ListRegencies extends ListRecords
     protected function getHeaderActions(): array
     {
         return [
-            Actions\CreateAction::make(),
+            CreateAction::make(),
         ];
     }
 }

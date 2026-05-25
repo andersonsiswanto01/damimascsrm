@@ -31,7 +31,7 @@ class OrderProduct extends Model
             
             static::created(function ($orderProduct) {
                 // ✅ Automatically insert into order_quantity_history after record exists
-                \App\Models\OrderQuantityHistory::create([
+                OrderQuantityHistory::create([
                     'order_product_id'   => $orderProduct->id,
                     'allocated_date'     => now(),
                     'allocated_quantity' => $orderProduct->qty,

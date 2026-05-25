@@ -3,6 +3,7 @@
 namespace App\Models;
 
 
+use Exception;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use App\Models\ProductQuantityHistory;
@@ -45,7 +46,7 @@ class Product extends Model
 
         // Prevent negative stock
         if ($newQuantity < 0) {
-            throw new \Exception('Stock cannot be negative.');
+            throw new Exception('Stock cannot be negative.');
         }
 
         // Update product stock

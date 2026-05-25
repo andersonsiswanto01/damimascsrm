@@ -2,12 +2,13 @@
 
 namespace App\Models;
 
+use Database\Factories\ReservationProductFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class ReservationProduct extends Model
 {
-    /** @use HasFactory<\Database\Factories\ReservationProductFactory> */
+    /** @use HasFactory<ReservationProductFactory> */
     use HasFactory;
 
     protected $table = 'reservation_product';

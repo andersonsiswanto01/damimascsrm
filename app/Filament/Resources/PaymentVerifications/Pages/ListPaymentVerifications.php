@@ -2,7 +2,8 @@
 
 namespace App\Filament\Resources\PaymentVerifications\Pages;
 
-use App\Filament\Resources\PaymentVerifications\PaymentVerificationResource;
+use Filament\Actions\CreateAction;
+use App\Filament\Resources\PaymentVerifications\PaymentVerifications\PaymentVerificationResource;
 use Filament\Actions;
 use Filament\Resources\Pages\ListRecords;
 
@@ -15,7 +16,7 @@ class ListPaymentVerifications extends ListRecords
     protected function getHeaderActions(): array
     {
         return [
-            Actions\CreateAction::make(),
+            CreateAction::make(),
         ];
     }
 

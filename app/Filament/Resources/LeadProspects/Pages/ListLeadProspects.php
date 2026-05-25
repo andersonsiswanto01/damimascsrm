@@ -2,7 +2,8 @@
 
 namespace App\Filament\Resources\LeadProspects\Pages;
 
-use App\Filament\Resources\LeadProspects\LeadProspectResource;
+use Filament\Actions\CreateAction;
+use App\Filament\Resources\LeadProspects\LeadProspects\LeadProspectResource;
 use Filament\Actions;
 use Filament\Resources\Pages\ListRecords;
 
@@ -13,7 +14,7 @@ class ListLeadProspects extends ListRecords
     protected function getHeaderActions(): array
     {
         return [
-            Actions\CreateAction::make(),
+            CreateAction::make(),
         ];
     }
 }

@@ -57,8 +57,8 @@ class OrderMaster extends Model
     public function corporateSp2bk()
 {
     return $this->hasManyThrough(
-        \App\Models\corporateSp2bk::class,   // child model
-        \App\Models\Customer::class,         // intermediate model
+        corporateSp2bk::class,   // child model
+        Customer::class,         // intermediate model
         'id',                                // foreign key on Customer (local key)
         'customer_id',                       // foreign key on CorporateSp2bk
         'customer_id',                       // local key on OrderMaster

@@ -2,7 +2,7 @@
 
 namespace App\Filament\Resources\Districts\Pages;
 
-use App\Filament\Resources\Districts\DistrictResource;
+use App\Filament\Resources\Districts\Districts\DistrictResource;
 use Filament\Actions;
 use Filament\Resources\Pages\CreateRecord;
 

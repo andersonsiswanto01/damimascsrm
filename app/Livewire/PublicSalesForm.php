@@ -2,6 +2,7 @@
 
 namespace App\Livewire;
 
+use Filament\Schemas\Schema;
 use App\Models\Order;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\DatePicker;
@@ -10,7 +11,6 @@ use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Concerns\InteractsWithForms;
 use Filament\Forms\Contracts\HasForms;
-use Filament\Forms\Form;
 use Illuminate\Contracts\View\View;
 use Livewire\Component;
 
@@ -54,15 +54,15 @@ class PublicSalesForm extends Component implements HasForms
     {
         $order = Order::find($orderId); // Find the order by ID
         $orderHistories = $order->order_stage_histories()->with('stage')->orderBy('created_at', 'asc')->get(); // Get the order stage histories
-    
+
         return $orderHistories; // Return the histories (or any other data you want to return)
     }
 
-    public function form(Form $form): Form
+    public function form(Schema $schema): Schema
     {
 
-        return $form
-            ->schema([
+        return $schema
+            ->components([
                 TextInput::make('customer_id')
                     ->label('Customer')
                     ->readOnly()

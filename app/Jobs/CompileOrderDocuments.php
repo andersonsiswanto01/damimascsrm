@@ -2,6 +2,8 @@
 
 namespace App\Jobs;
 
+use App\Models\User;
+use Filament\Actions\Action;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
@@ -11,7 +13,6 @@ use App\Models\Order;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Support\Facades\Storage;
 use Filament\Notifications\Notification;
-use Filament\Notifications\Actions\Action;
 
 class CompileOrderDocuments implements ShouldQueue
 {
@@ -32,7 +33,7 @@ class CompileOrderDocuments implements ShouldQueue
     {
 
 
-        $user = \App\Models\User::find($this->userId);
+        $user = User::find($this->userId);
 
         $orders = Order::with(['orderMaster.user'])->where('order_stage_id', 5)->get();
     

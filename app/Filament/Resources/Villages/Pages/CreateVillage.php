@@ -2,7 +2,7 @@
 
 namespace App\Filament\Resources\Villages\Pages;
 
-use App\Filament\Resources\Villages\VillageResource;
+use App\Filament\Resources\Villages\Villages\VillageResource;
 use Filament\Actions;
 use Filament\Resources\Pages\CreateRecord;
 

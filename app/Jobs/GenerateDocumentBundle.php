@@ -2,6 +2,7 @@
 
 namespace App\Jobs;
 
+use Filament\Actions\Action;
 use App\Models\Order;
 use Illuminate\Bus\Queueable;
 use Illuminate\Support\Collection;
@@ -13,7 +14,6 @@ use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Filament\Notifications\Notification;
-use Filament\Notifications\Actions\Action;
 use App\Notifications\NewOrderNotification;
 use App\Models\User;
 use ZipArchive;
@@ -42,7 +42,7 @@ class GenerateDocumentBundle implements ShouldQueue
      public function handle(): void
     {
         $orders = Order::with([
-            'orderMaster.customer.corporateSp2bks',
+            'orderMaster.customer.corporateSp2bk',
             'district',
             'village',
             'regency',
@@ -93,7 +93,7 @@ class GenerateDocumentBundle implements ShouldQueue
         }
 
         if (in_array($customer->status, ['corporate', 'breeder'])) {
-            $sp2bksPath = $customer->corporateSp2bks->sp2bks_file;
+            $sp2bksPath = $customer->corporateSp2bk->sp2bks_file;
 
             if ($sp2bksPath && str_ends_with(strtolower($sp2bksPath), '.pdf')) {
                 $fullPath = storage_path('app/private/' . $sp2bksPath);

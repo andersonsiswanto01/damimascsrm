@@ -2,8 +2,12 @@
 
 namespace App\Filament\Resources\OrderMasters\RelationManagers;
 
+use Filament\Schemas\Schema;
+use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\FileUpload;
+use Filament\Forms\Components\DatePicker;
+use Filament\Tables\Columns\TextColumn;
 use Filament\Forms;
-use Filament\Forms\Form;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Tables;
 use Filament\Tables\Table;
@@ -23,16 +27,16 @@ class CorporateSp2bksRelationManager extends RelationManager
             ->getQuery();
     }
 
-    public function form(Form $form): Form
+    public function form(Schema $schema): Schema
     {
-        return $form
-            ->schema([
-                Forms\Components\TextInput::make('id')->label('SP2BKS ID')->required(),
-                Forms\Components\FileUpload::make('sp2bks_file')
+        return $schema
+            ->components([
+                TextInput::make('id')->label('SP2BKS ID')->required(),
+                FileUpload::make('sp2bks_file')
                     ->disk('local')
                     ->directory('private/corporate_sp2bks')
                     ->downloadable(),
-                Forms\Components\DatePicker::make('expiry_date')->label('Expiry Date'),
+                DatePicker::make('expiry_date')->label('Expiry Date'),
                     ]);
     }
 
@@ -46,10 +50,10 @@ class CorporateSp2bksRelationManager extends RelationManager
     {
          return $table
             ->columns([
-                Tables\Columns\TextColumn::make('id')
+                TextColumn::make('id')
                     ->label('SP2BKS ID'),
 
-                Tables\Columns\TextColumn::make('expiry_date')
+                TextColumn::make('expiry_date')
                     ->label('Expiry Date')
                     ->date(),
 
@@ -64,7 +68,7 @@ class CorporateSp2bksRelationManager extends RelationManager
             ])
             ->filters([])
             ->headerActions([]) // keep read-only; add create if you want editable
-            ->actions([])
-            ->bulkActions([]);
+            ->recordActions([])
+            ->toolbarActions([]);
     }
 }

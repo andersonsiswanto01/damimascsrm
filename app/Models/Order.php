@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use Illuminate\Validation\ValidationException;
+use InvalidArgumentException;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Auth;
@@ -29,14 +31,14 @@ class Order extends Model
     static::saving(function ($order) {
 
         // Check if the order is being created or updated
-        $village = \App\Models\Village::find($order->village_id);
-        $district = \App\Models\District::find($order->district_id);
-        $regency = \App\Models\Regency::find($order->regency_id);
-        $province = \App\Models\Province::find($order->province_id);
+        $village = Village::find($order->village_id);
+        $district = District::find($order->district_id);
+        $regency = Regency::find($order->regency_id);
+        $province = Province::find($order->province_id);
 
         // Basic existence check
         if (!$village || !$district || !$regency || !$province) {
-            throw \Illuminate\Validation\ValidationException::withMessages([
+            throw ValidationException::withMessages([
                 'village_id' => 'Invalid region data selected.',
             ]);
         }
@@ -47,7 +49,7 @@ class Order extends Model
             $district->regency_id != $regency->id ||
             $regency->province_id != $province->id
         ) {
-            throw \Illuminate\Validation\ValidationException::withMessages([
+            throw ValidationException::withMessages([
                 'village_id' => 'The selected region hierarchy is invalid.',
             ]);
         }
@@ -153,7 +155,7 @@ class Order extends Model
         $maxStageId = OrderDocumentStage::max('id');
 
         if ($this->order_document_stage_id >= $maxStageId) {
-            throw new \InvalidArgumentException("Order already cancelled");
+            throw new InvalidArgumentException("Order already cancelled");
         }
 
         // If documents are in revision, reset to initial stage instead of incrementing
@@ -176,7 +178,7 @@ class Order extends Model
         $minStageId = OrderDocumentStage::min('id');
 
         if ($this->order_stage_id <= $minStageId) {
-            throw new \InvalidArgumentException("Order is already at the initial stage.");
+            throw new InvalidArgumentException("Order is already at the initial stage.");
         }
 
         $this->order_document_stage_id--;

@@ -2,11 +2,14 @@
 
 namespace App\Filament\Resources\InternalCorporates;
 
+use Filament\Schemas\Schema;
+use Filament\Forms\Components\TextInput;
+use Filament\Tables\Columns\TextColumn;
+use App\Filament\Resources\InternalCorporates\Pages\ListInternalCorporates;
 use App\Filament\Resources\InternalCorporates\Pages;
 use App\Filament\Resources\InternalCorporateResource\RelationManagers;
 use App\Models\InternalCorporate;
 use Filament\Forms;
-use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
@@ -17,31 +20,31 @@ class InternalCorporateResource extends Resource
 {
     protected static ?string $model = InternalCorporate::class;
 
-    protected static ?string $navigationIcon = 'heroicon-m-briefcase';
+    protected static string | \BackedEnum | null $navigationIcon = 'heroicon-m-briefcase';
 
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema
     {
-        return $form
-            ->schema([
-                Forms\Components\TextInput::make('psm')
+        return $schema
+            ->components([
+                TextInput::make('psm')
                     ->required()
                     ->maxLength(255),
-                Forms\Components\TextInput::make('province_id')
+                TextInput::make('province_id')
                     ->required()
                     ->numeric(),
-                Forms\Components\TextInput::make('internal_corporate_type_id')
+                TextInput::make('internal_corporate_type_id')
                     ->required()
                     ->numeric(),
-                Forms\Components\TextInput::make('initial')
+                TextInput::make('initial')
                     ->required()
                     ->maxLength(10),
-                Forms\Components\TextInput::make('legal_form')
+                TextInput::make('legal_form')
                     ->required()
                     ->maxLength(255),
-                Forms\Components\TextInput::make('pt_name')
+                TextInput::make('pt_name')
                     ->required()
                     ->maxLength(255),
-                Forms\Components\TextInput::make('name')
+                TextInput::make('name')
                     ->required()
                     ->maxLength(255),
             ]);
@@ -52,20 +55,20 @@ class InternalCorporateResource extends Resource
     {
        return $table
             ->columns([
-                Tables\Columns\TextColumn::make('id')->sortable(),
-                Tables\Columns\TextColumn::make('psm')->sortable()->searchable(),
-                Tables\Columns\TextColumn::make('legal_form')->label('Legal Form'),
-                Tables\Columns\TextColumn::make('initial')->sortable()->searchable(),
-                Tables\Columns\TextColumn::make('pt_name')->label('Corporate Name')->sortable()->searchable(),
-                Tables\Columns\TextColumn::make('name')->label('Estate')->sortable()->searchable(),
+                TextColumn::make('id')->sortable(),
+                TextColumn::make('psm')->sortable()->searchable(),
+                TextColumn::make('legal_form')->label('Legal Form'),
+                TextColumn::make('initial')->sortable()->searchable(),
+                TextColumn::make('pt_name')->label('Corporate Name')->sortable()->searchable(),
+                TextColumn::make('name')->label('Estate')->sortable()->searchable(),
             ])
             ->filters([
                 //
             ])
             ->defaultSort('id', 'desc')
-            ->actions([
+            ->recordActions([
             ])
-            ->bulkActions([
+            ->toolbarActions([
             ]);
     }
 
@@ -79,7 +82,7 @@ class InternalCorporateResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListInternalCorporates::route('/'),
+            'index' => ListInternalCorporates::route('/'),
         ];
     }
 }

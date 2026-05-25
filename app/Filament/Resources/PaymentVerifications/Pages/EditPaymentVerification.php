@@ -2,7 +2,7 @@
 
 namespace App\Filament\Resources\PaymentVerifications\Pages;
 
-use App\Filament\Resources\PaymentVerifications\PaymentVerificationResource;
+use App\Filament\Resources\PaymentVerifications\PaymentVerifications\PaymentVerificationResource;
 use Filament\Actions;
 use Filament\Resources\Pages\EditRecord;
 

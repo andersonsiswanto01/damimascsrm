@@ -2,7 +2,8 @@
 
 namespace App\Filament\Resources\CorporateSp2bks\Pages;
 
-use App\Filament\Resources\CorporateSp2bks\CorporateSp2bksResource;
+use Filament\Actions\DeleteAction;
+use App\Filament\Resources\CorporateSp2bks\CorporateSp2bks\CorporateSp2bksResource;
 use Filament\Actions;
 use Filament\Resources\Pages\EditRecord;
 
@@ -13,7 +14,7 @@ class EditCorporateSp2bks extends EditRecord
     protected function getHeaderActions(): array
     {
         return [
-            Actions\DeleteAction::make(),
+            DeleteAction::make(),
         ];
     }
 }

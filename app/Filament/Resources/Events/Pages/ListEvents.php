@@ -2,7 +2,8 @@
 
 namespace App\Filament\Resources\Events\Pages;
 
-use App\Filament\Resources\Events\EventResource;
+use Filament\Actions\CreateAction;
+use App\Filament\Resources\Events\Events\EventResource;
 use Filament\Actions;
 use Filament\Resources\Pages\ListRecords;
 
@@ -13,7 +14,7 @@ class ListEvents extends ListRecords
     protected function getHeaderActions(): array
     {
         return [
-            Actions\CreateAction::make(),
+            CreateAction::make(),
         ];
     }
 }

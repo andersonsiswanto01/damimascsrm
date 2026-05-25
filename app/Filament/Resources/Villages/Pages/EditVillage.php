@@ -2,7 +2,8 @@
 
 namespace App\Filament\Resources\Villages\Pages;
 
-use App\Filament\Resources\Villages\VillageResource;
+use Filament\Actions\DeleteAction;
+use App\Filament\Resources\Villages\Villages\VillageResource;
 use Filament\Actions;
 use Filament\Resources\Pages\EditRecord;
 
@@ -13,7 +14,7 @@ class EditVillage extends EditRecord
     protected function getHeaderActions(): array
     {
         return [
-            Actions\DeleteAction::make(),
+            DeleteAction::make(),
         ];
     }
 }

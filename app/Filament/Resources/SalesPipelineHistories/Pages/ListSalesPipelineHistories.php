@@ -2,7 +2,8 @@
 
 namespace App\Filament\Resources\SalesPipelineHistories\Pages;
 
-use App\Filament\Resources\SalesPipelineHistories\SalesPipelineHistoryResource;
+use Filament\Actions\CreateAction;
+use App\Filament\Resources\SalesPipelineHistories\SalesPipelineHistories\SalesPipelineHistoryResource;
 use Filament\Actions;
 use Filament\Resources\Pages\ListRecords;
 
@@ -13,7 +14,7 @@ class ListSalesPipelineHistories extends ListRecords
     protected function getHeaderActions(): array
     {
         return [
-            Actions\CreateAction::make(),
+            CreateAction::make(),
         ];
     }
 }

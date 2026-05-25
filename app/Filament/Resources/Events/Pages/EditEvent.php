@@ -2,7 +2,8 @@
 
 namespace App\Filament\Resources\Events\Pages;
 
-use App\Filament\Resources\Events\EventResource;
+use Filament\Actions\DeleteAction;
+use App\Filament\Resources\Events\Events\EventResource;
 use Filament\Actions;
 use Filament\Resources\Pages\EditRecord;
 
@@ -13,7 +14,7 @@ class EditEvent extends EditRecord
     protected function getHeaderActions(): array
     {
         return [
-            Actions\DeleteAction::make(),
+            DeleteAction::make(),
         ];
     }
 }

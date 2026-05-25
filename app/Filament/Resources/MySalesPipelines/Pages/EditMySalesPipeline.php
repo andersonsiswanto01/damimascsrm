@@ -2,7 +2,8 @@
 
 namespace App\Filament\Resources\MySalesPipelines\Pages;
 
-use App\Filament\Resources\MySalesPipelines\MySalesPipelineResource;
+use Filament\Actions\DeleteAction;
+use App\Filament\Resources\MySalesPipelines\MySalesPipelines\MySalesPipelineResource;
 use Filament\Actions;
 use Filament\Resources\Pages\EditRecord;
 use Livewire\Livewire;
@@ -22,7 +23,7 @@ class EditMySalesPipeline extends EditRecord
     protected function getHeaderActions(): array
     {
         return [
-            Actions\DeleteAction::make(),
+            DeleteAction::make(),
         ];
     }
 

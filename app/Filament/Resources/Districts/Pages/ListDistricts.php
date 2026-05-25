@@ -2,7 +2,8 @@
 
 namespace App\Filament\Resources\Districts\Pages;
 
-use App\Filament\Resources\Districts\DistrictResource;
+use Filament\Actions\CreateAction;
+use App\Filament\Resources\Districts\Districts\DistrictResource;
 use Filament\Actions;
 use Filament\Resources\Pages\ListRecords;
 
@@ -13,7 +14,7 @@ class ListDistricts extends ListRecords
     protected function getHeaderActions(): array
     {
         return [
-            Actions\CreateAction::make(),
+            CreateAction::make(),
         ];
     }
 }

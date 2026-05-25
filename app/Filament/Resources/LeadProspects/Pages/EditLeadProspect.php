@@ -2,7 +2,8 @@
 
 namespace App\Filament\Resources\LeadProspects\Pages;
 
-use App\Filament\Resources\LeadProspects\LeadProspectResource;
+use Filament\Actions\DeleteAction;
+use App\Filament\Resources\LeadProspects\LeadProspects\LeadProspectResource;
 use Filament\Actions;
 use Filament\Resources\Pages\EditRecord;
 
@@ -13,7 +14,7 @@ class EditLeadProspect extends EditRecord
     protected function getHeaderActions(): array
     {
         return [
-            Actions\DeleteAction::make(),
+            DeleteAction::make(),
         ];
     }
 }

@@ -2,6 +2,7 @@
 
 namespace App\Jobs;
 
+use Carbon\Carbon;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
 
@@ -142,7 +143,7 @@ class ProcessDocumentBatchJob implements ShouldQueue
                         'extracted_name' => $entitiesData['nama']['value'] ?? null,
                         'extracted_nik' => $entitiesData['NIK']['value'] ?? null,
                         'extracted_birth' => $entitiesData['tempat_tanggal_lahir']['value'] ?? null,
-                        'extracted_date' => isset($entitiesData['date']['value']) ? \Carbon\Carbon::parse($entitiesData['date']['value']) : null,
+                        'extracted_date' => isset($entitiesData['date']['value']) ? Carbon::parse($entitiesData['date']['value']) : null,
                     ];
 
                 } elseif ($config['data_type'] == 'sp') {
@@ -154,7 +155,7 @@ class ProcessDocumentBatchJob implements ShouldQueue
                         'extracted_name' => $entitiesData['nama']['value'] ?? null,
                         'extracted_nik' => $entitiesData['NIK']['value'] ?? null,
                         'extracted_signature' => $entitiesData['tanda_tangan']['value'] ?? null,
-                        'extracted_date' => isset($entitiesData['date']['value']) ? \Carbon\Carbon::parse($entitiesData['date']['value']) : null,
+                        'extracted_date' => isset($entitiesData['date']['value']) ? Carbon::parse($entitiesData['date']['value']) : null,
                     ];
                 }
 

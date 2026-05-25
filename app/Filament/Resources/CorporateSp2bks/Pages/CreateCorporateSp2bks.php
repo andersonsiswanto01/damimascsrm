@@ -2,7 +2,7 @@
 
 namespace App\Filament\Resources\CorporateSp2bks\Pages;
 
-use App\Filament\Resources\CorporateSp2bks\CorporateSp2bksResource;
+use App\Filament\Resources\CorporateSp2bks\CorporateSp2bks\CorporateSp2bksResource;
 use Filament\Actions;
 use Filament\Resources\Pages\CreateRecord;
 

@@ -2,7 +2,9 @@
 
 namespace App\Filament\Resources\Customers\Pages;
 
-use App\Filament\Resources\Customers\CustomerResource;
+use Filament\Actions\ViewAction;
+use Filament\Actions\DeleteAction;
+use App\Filament\Resources\Customers\Customers\CustomerResource;
 use Filament\Actions;
 use Filament\Resources\Pages\EditRecord;
 use Filament\Notifications\Notification;
@@ -15,8 +17,8 @@ class EditCustomer extends EditRecord
     protected function getHeaderActions(): array
     {
         return [
-            Actions\ViewAction::make(),
-            Actions\DeleteAction::make(),
+            ViewAction::make(),
+            DeleteAction::make(),
         ];
     }
 

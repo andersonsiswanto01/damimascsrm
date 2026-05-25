@@ -2,13 +2,21 @@
 
 namespace App\Filament\Resources\Calendars\Widgets;
 
+use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\Textarea;
+use Filament\Schemas\Components\Grid;
+use Filament\Forms\Components\DateTimePicker;
+use Saade\FilamentFullCalendar\Actions\CreateAction;
+use Filament\Schemas\Schema;
+use Saade\FilamentFullCalendar\Actions\EditAction;
+use Saade\FilamentFullCalendar\Actions\DeleteAction;
 use Saade\FilamentFullCalendar\Widgets\FullCalendarWidget;
 use Saade\FilamentFullCalendar\Actions;
 use App\Models\Calendar;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
 use Filament\Forms;
-use App\Filament\Resources\Calendars\CalendarResource;
+use App\Filament\Resources\Calendars\Calendars\CalendarResource;
 
 class CalendarWidget extends FullCalendarWidget
 {
@@ -30,17 +38,17 @@ class CalendarWidget extends FullCalendarWidget
     public function getFormSchema(): array
     {
         return [
-            Forms\Components\TextInput::make('title'),
+            TextInput::make('title'),
 
-            Forms\Components\Textarea::make('description')
+            Textarea::make('description')
                 ->rows(3)
                 ->columnSpanFull(),
 
-            Forms\Components\Grid::make()
+            Grid::make()
                 ->schema([
-                    Forms\Components\DateTimePicker::make('start_time'),
+                    DateTimePicker::make('start_time'),
 
-                    Forms\Components\DateTimePicker::make('end_time'),
+                    DateTimePicker::make('end_time'),
                 ]),
         ];
     }
@@ -48,10 +56,10 @@ class CalendarWidget extends FullCalendarWidget
 protected function headerActions(): array
  {
      return [
-         Actions\CreateAction::make()
+         CreateAction::make()
              ->mountUsing(
-                 function (Forms\Form $form, array $arguments) {
-                     $form->fill([
+                 function (Schema $schema, array $arguments) {
+                     $schema->fill([
                          'start_time' => $arguments['start'] ?? null,
                          'end_time' => $arguments['end'] ?? null
                      ]);
@@ -63,10 +71,10 @@ protected function headerActions(): array
     protected function modalActions(): array
  {
      return [
-         Actions\EditAction::make()
+         EditAction::make()
              ->mountUsing(
-                 function (Calendar $record, Forms\Form $form, array $arguments) {
-                     $form->fill([
+                 function (Calendar $record, Schema $schema, array $arguments) {
+                     $schema->fill([
                         'id'=> $record->id,
                          'title' => $record->title,
                          'description' => $record->description,
@@ -76,7 +84,7 @@ protected function headerActions(): array
                      ]);
                  }
              ),
-         Actions\DeleteAction::make(),
+         DeleteAction::make(),
      ];
  }
 

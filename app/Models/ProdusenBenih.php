@@ -18,8 +18,8 @@ class ProdusenBenih extends Model
     public function sp2bksProducts()
 {
     return $this->hasManyThrough(
-        \App\Models\Sp2bksProduct::class,     // Final model to retrieve
-        \App\Models\ProdusenBenihProduct::class, // Intermediate model
+        Sp2bksProduct::class,     // Final model to retrieve
+        ProdusenBenihProduct::class, // Intermediate model
         'produsen_benih_id',                  // Foreign key on intermediate table
         'produsen_benih_product_id',          // Foreign key on final table
         'id',                                 // Local key on ProdusenBenih

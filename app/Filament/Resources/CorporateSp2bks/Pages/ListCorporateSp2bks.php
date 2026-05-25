@@ -2,7 +2,8 @@
 
 namespace App\Filament\Resources\CorporateSp2bks\Pages;
 
-use App\Filament\Resources\CorporateSp2bks\CorporateSp2bksResource;
+use Filament\Actions\CreateAction;
+use App\Filament\Resources\CorporateSp2bks\CorporateSp2bks\CorporateSp2bksResource;
 use Filament\Actions;
 use Filament\Resources\Pages\ListRecords;
 
@@ -13,7 +14,7 @@ class ListCorporateSp2bks extends ListRecords
     protected function getHeaderActions(): array
     {
         return [
-            Actions\CreateAction::make(),
+            CreateAction::make(),
         ];
     }
 }

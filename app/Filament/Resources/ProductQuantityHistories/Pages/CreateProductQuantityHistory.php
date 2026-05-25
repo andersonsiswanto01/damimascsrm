@@ -2,7 +2,7 @@
 
 namespace App\Filament\Resources\ProductQuantityHistories\Pages;
 
-use App\Filament\Resources\ProductQuantityHistories\ProductQuantityHistoryResource;
+use App\Filament\Resources\ProductQuantityHistories\ProductQuantityHistories\ProductQuantityHistoryResource;
 use Filament\Actions;
 use Filament\Resources\Pages\CreateRecord;
 

@@ -2,7 +2,8 @@
 
 namespace App\Filament\Resources\OrderDocumentVerifications\Pages;
 
-use App\Filament\Resources\OrderDocumentVerifications\OrderDocumentVerificationResource;
+use Filament\Actions\CreateAction;
+use App\Filament\Resources\OrderDocumentVerifications\OrderDocumentVerifications\OrderDocumentVerificationResource;
 use Filament\Actions;
 use Filament\Resources\Pages\ListRecords;
 
@@ -13,7 +14,7 @@ class ListOrderDocumentVerifications extends ListRecords
     protected function getHeaderActions(): array
     {
         return [
-            Actions\CreateAction::make(),
+            CreateAction::make(),
         ];
     }
 

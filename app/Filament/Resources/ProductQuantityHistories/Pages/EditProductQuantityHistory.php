@@ -2,7 +2,8 @@
 
 namespace App\Filament\Resources\ProductQuantityHistories\Pages;
 
-use App\Filament\Resources\ProductQuantityHistories\ProductQuantityHistoryResource;
+use Filament\Actions\DeleteAction;
+use App\Filament\Resources\ProductQuantityHistories\ProductQuantityHistories\ProductQuantityHistoryResource;
 use Filament\Actions;
 use Filament\Resources\Pages\EditRecord;
 
@@ -13,7 +14,7 @@ class EditProductQuantityHistory extends EditRecord
     protected function getHeaderActions(): array
     {
         return [
-            Actions\DeleteAction::make(),
+            DeleteAction::make(),
         ];
     }
 }
